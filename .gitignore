@@ -14,8 +14,6 @@ env/
 *.log
 *.tmp
 
-# Ignore output data
-data/scraped_prices.xlsx
 
 # Ignore CSV input (optional, if you don’t want to commit JAN codes)
 data/jan_codes.csv
