@@ -1,11 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+# import pandas as pd
 import time
 
 # Function to scrape Yahoo Auctions
 def scrape_yahoo_auctions(jan_code):
-    url = f"https://auctions.yahoo.co.jp/search/search?p={jan_code}"
+    url = f"https://shopping.yahoo.co.jp/search/search?p={jan_code}"
     headers = {"User-Agent": "Mozilla/5.0"}
     
     response = requests.get(url, headers=headers)
@@ -59,8 +59,8 @@ for jan_code in jan_codes:
     
     time.sleep(2)  # Sleep to avoid getting blocked
 
-# Save results to a new Excel file
-output_df = pd.DataFrame(results)
-output_df.to_excel("scraped_prices.xlsx", index=False)
+# # Save results to a new Excel file
+# output_df = pd.DataFrame(results)
+# output_df.to_excel("scraped_prices.xlsx", index=False)
 
 print("Scraping complete! Results saved to scraped_prices.xlsx.")
