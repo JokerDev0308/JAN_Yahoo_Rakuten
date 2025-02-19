@@ -1,71 +1,73 @@
-import requests
-from bs4 import BeautifulSoup
-# import pandas as pd
-import time
+import pandas as pd
+from scripts.amazon_scraper import AmazonScraper
+from scripts.yahoo_scraper import YahooScraper
+from scripts.rakuten_scraper import RakutenScraper
+from config import JANCODE_SCV, OUTPUT_XLSX, RUNNING, WAITING
+import os
+from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 
-# Function to scrape Yahoo Auctions
-def scrape_yahoo_auctions(jan_code):
-    url = f"https://shopping.yahoo.co.jp/search/search?p={jan_code}"
-    headers = {"User-Agent": "Mozilla/5.0"}
+
+class PriceScraper:
+    def __init__(self):
+        self.df = None
+        self.amazon_scraper = AmazonScraper()
+        self.yahoo_scraper = YahooScraper()
+        self.rakuten_scraper = RakutenScraper()
+
+    def load_data(self):
+        self.df = pd.read_csv(JANCODE_SCV)
     
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    prices = []
-    
-    for item in soup.select(".Product__price"):
-        price_text = item.get_text(strip=True).replace("円", "").replace(",", "")
-        if price_text.isdigit():
-            prices.append(int(price_text))
-    
-    return min(prices) if prices else "Not Found"
+    def scrape_running(self):
+        total_records = len(self.df)
+        for index, row in self.df.iterrows():
+            while WAITING:
+                sleep(1)
+                continue
 
-# Function to scrape Rakuten
-def scrape_rakuten(jan_code):
-    url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    prices = []
-    
-    for item in soup.select(".searchresultitem .important"):
-        price_text = item.get_text(strip=True).replace("円", "").replace(",", "")
-        if price_text.isdigit():
-            prices.append(int(price_text))
-    
-    return min(prices) if prices else "Not Found"
+            jan = row['JAN']
+            print(f"Processing {index + 1}/{total_records}: JAN {jan}")
+            
+            # Scrape prices concurrently
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
+                yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
+                rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+                
+                self.df.at[index, 'Amazon Price'] = amazon_future.result()
+                self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
+                self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
+            
+            # Calculate prices for current record
+            self.calculate_prices_for_row(index)
+            
+            # Save intermediate results
+            self.save_results()
 
-# Load JAN codes from an Excel file
-# file_path = "product_list.xlsx"  # Update with your actual file path
-# df = pd.read_excel(file_path)
-
-# Assuming the JAN codes are in a column named 'JAN Code'
-# jan_codes = df["JAN Code"].tolist()
-
-jan_codes = [4960759910639]
-
-# Create a results list
-results = []
-
-for jan_code in jan_codes:
-    print(f"Scraping JAN: {jan_code}...")
-    
-    yahoo_price = scrape_yahoo_auctions(jan_code)
-    rakuten_price = scrape_rakuten(jan_code)
-    print("JAN Code=", jan_code, "  Yahoo Price=", yahoo_price, "  Rakuten Price=", rakuten_price)
-    results.append({"JAN Code": jan_code, "Yahoo Price": yahoo_price, "Rakuten Price": rakuten_price})
-    
-    time.sleep(2)  # Sleep to avoid getting blocked
-
-# # Save results to a new Excel file
-# output_df = pd.DataFrame(results)
-# output_df.to_excel("scraped_prices.xlsx", index=False)
+            sleep(2)
+            
+    def calculate_prices_for_row(self, index):
+        prices = [
+            self.df.at[index, 'Amazon Price'],
+            self.df.at[index, 'Yahoo Price'],
+            self.df.at[index, 'Rakuten Price']
+        ]
+        self.df.at[index, 'Min Price'] = min(prices)
+        self.df.at[index, 'Price Difference'] = self.df.at[index, 'Master Price'] - self.df.at[index, 'Min Price']
 
 
-print("=======================")
-print(results)
-print("=======================")
+    def save_results(self):
+        os.makedirs(os.path.dirname(OUTPUT_XLSX), exist_ok=True)
+        self.df.to_excel(OUTPUT_XLSX, index=False)
+        print(f"Progress saved to {OUTPUT_XLSX}")
 
-print("Scraping complete! Results saved to scraped_prices.xlsx.")
+def main():
+    while RUNNING:
+        scraper = PriceScraper()
+        scraper.load_data()
+        scraper.scrape_running()
+        
+        sleep(10)
+
+if __name__ == "__main__":
+    main()

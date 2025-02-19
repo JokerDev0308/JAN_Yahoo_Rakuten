@@ -1,0 +1,40 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environments
+venv/
+.venv/
+.env/
+env/
+
+# Ignore logs and temp files
+*.log
+*.tmp
+
+# Ignore output data
+data/scraped_prices.xlsx
+
+# Ignore CSV input (optional, if you don’t want to commit JAN codes)
+data/jan_codes.csv
+
+# Ignore Selenium WebDriver binaries
+drivers/chromedriver
+drivers/geckodriver
+
+# Ignore IDE/editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Ignore Streamlit cache
+.streamlit/
+
+# Ignore Jupyter Notebook checkpoints (if used)
+.ipynb_checkpoints/
+
+# Ignore macOS and Windows system files
+.DS_Store
+Thumbs.db
