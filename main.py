@@ -54,7 +54,7 @@ for jan_code in jan_codes:
     
     yahoo_price = scrape_yahoo_auctions(jan_code)
     rakuten_price = scrape_rakuten(jan_code)
-    
+    print("JAN Code=", jan_code, "  Yahoo Price=", yahoo_price, "  Rakuten Price=", rakuten_price)
     results.append({"JAN Code": jan_code, "Yahoo Price": yahoo_price, "Rakuten Price": rakuten_price})
     
     time.sleep(2)  # Sleep to avoid getting blocked
@@ -62,5 +62,10 @@ for jan_code in jan_codes:
 # # Save results to a new Excel file
 # output_df = pd.DataFrame(results)
 # output_df.to_excel("scraped_prices.xlsx", index=False)
+
+
+print("=======================")
+print(results)
+print("=======================")
 
 print("Scraping complete! Results saved to scraped_prices.xlsx.")
