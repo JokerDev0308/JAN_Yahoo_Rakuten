@@ -8,7 +8,7 @@ headless = true
 # Disable the browser auto-launch when the app starts
 open_browser = false
 # Set the address to allow connections from any host
-address = "0.0.0.0"
+#address = "0.0.0.0"
 
 
 
