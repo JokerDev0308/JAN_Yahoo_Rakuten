@@ -27,8 +27,7 @@ drivers/geckodriver
 .idea/
 *.sublime-workspace
 
-# Ignore Streamlit cache
-.streamlit/
+
 
 # Ignore Jupyter Notebook checkpoints (if used)
 .ipynb_checkpoints/

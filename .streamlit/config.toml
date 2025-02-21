@@ -1,0 +1,22 @@
+# ~/.streamlit/config.toml
+
+[server]
+# Specify the port for Streamlit to run on
+port = 8501
+# Allow access to Streamlit app from any IP address (useful for VPS setup)
+headless = true
+# Disable the browser auto-launch when the app starts
+open_browser = false
+# Set the address to allow connections from any host
+address = "0.0.0.0"
+
+[browser]
+# Disable the auto-opening of a new tab in the browser when running the app
+serverAddress = "http://localhost:8501"
+
+[theme]
+# Set a default theme (optional, customize as needed)
+primaryColor = "blue"
+backgroundColor = "white"
+secondaryBackgroundColor = "gray"
+font = "sans serif"
