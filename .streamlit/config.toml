@@ -15,8 +15,8 @@ address = "0.0.0.0"
 serverAddress = "162.43.90.7"
 
 [theme]
-# Set a default theme (optional, customize as needed)
-primaryColor = "blue"
-backgroundColor = "white"
-secondaryBackgroundColor = "gray"
+base="dark"
 font = "sans serif"
+
+[runner]
+fastReruns = false
