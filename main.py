@@ -33,6 +33,8 @@ class PriceScraper:
                 # amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
                 yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
                 # rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+
+                print(yahoo_future)
                 
                 # self.df.at[index, 'Amazon Price'] = amazon_future.result()
                 self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
