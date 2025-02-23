@@ -16,7 +16,7 @@ class YahooScraper:
             options.add_argument("--no-sandbox")  # Add no-sandbox option
             options.add_argument("--disable-dev-shm-usage")  # Add disable-dev-shm-usage option
             options.binary_location = "/usr/bin/google-chrome"  # Update if necessary
-
+            options.add_argument("--remote-debugging-port=9222")
         service = Service(CHROMEDRIVER_PATH)
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(TIMEOUT)
