@@ -30,21 +30,28 @@ class PriceScraper:
             
             # Scrape prices concurrently
             with ThreadPoolExecutor(max_workers=3) as executor:
-                # amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
-                yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
-                # rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+                try:
+                    amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
+                    yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
+                    rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
-                print(yahoo_future)
+                    # Wait for results
+                    self.df.at[index, 'Amazon Price'] = amazon_future.result()
+                    self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
+                    self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                 
-                # self.df.at[index, 'Amazon Price'] = amazon_future.result()
-                self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
-                # self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
+                except Exception as e:
+                    print(f"Error scraping prices for JAN {jan}: {e}")
+                    self.df.at[index, 'Amazon Price'] = "Error"
+                    self.df.at[index, 'Yahoo Price'] = "Error"
+                    self.df.at[index, 'Rakuten Price'] = "Error"
             
             # Calculate prices for current record
             self.calculate_prices_for_row(index)
             
             # Save intermediate results
-            self.save_results()
+            if (index + 1) % 50 == 0:
+                self.save_results()
 
             sleep(2)
             
