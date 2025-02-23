@@ -57,12 +57,12 @@ class PriceScraper:
             
     def calculate_prices_for_row(self, index):
         prices = [
-            self.df.at[index, 'Amazon Price'],
+            # self.df.at[index, 'Amazon Price'],
             self.df.at[index, 'Yahoo Price'],
-            self.df.at[index, 'Rakuten Price']
+            # self.df.at[index, 'Rakuten Price']
         ]
         self.df.at[index, 'Min Price'] = min(prices)
-        self.df.at[index, 'Price Difference'] = self.df.at[index, 'Master Price'] - self.df.at[index, 'Min Price']
+        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - self.df.at[index, 'Min Price']
 
 
     def save_results(self):

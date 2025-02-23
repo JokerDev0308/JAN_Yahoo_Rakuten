@@ -74,11 +74,4 @@ class YahooScraper:
             self.driver.quit()
             self.driver = None
 
-if __name__ == "__main__":
-    test_jan = "4902370519984"
-    scraper = YahooScraper()
-    try:
-        price = scraper.scrape_price(test_jan)
-        print(f"Yahoo Price for {test_jan}: ¥{price}")
-    finally:
-        scraper.close()
+
