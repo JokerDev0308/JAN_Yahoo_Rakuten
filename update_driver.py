@@ -11,7 +11,7 @@ options = Options()
 options.add_argument("--headless")  # Run Chrome in headless mode
 options.add_argument("--no-sandbox")  # Disable sandbox (required for headless mode)
 options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources issue on VPS
-options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration (not needed in headless)
+# options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration (not needed in headless)
 
 # Setup the ChromeDriver service
 service = Service(chrome_driver_path)
