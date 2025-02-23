@@ -60,6 +60,8 @@ class YahooScraper:
                 price = "N/A"
         except Exception:
             price = "N/A"
+        
+        print(price)
 
         return price
 
