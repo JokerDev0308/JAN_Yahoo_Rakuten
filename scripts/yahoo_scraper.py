@@ -32,8 +32,6 @@ class YahooScraper:
             # Find all items
             items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
 
-            print("===========items", items)
-            
             # Initialize variables for tracking minimum price
             min_price = float('inf')
             min_price_link = None
@@ -53,6 +51,7 @@ class YahooScraper:
                     continue
             
             if min_price != float('inf'):
+                print(min_price)
                 # Navigate to the page with lowest price
                 min_price_link.click()
                 # Wait for the new page to load and find the first price element
