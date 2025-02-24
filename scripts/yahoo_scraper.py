@@ -67,7 +67,7 @@ class YahooScraper:
                 # Wait for the new page to load and the price element to become visible
                 try:
                     price_element = WebDriverWait(self.driver, TIMEOUT).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                     )
                     price = price_element[0].text.replace("円", "").replace(",", "").strip()
                     logger.info(f"Price on new page: {price}")
