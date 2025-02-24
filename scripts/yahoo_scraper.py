@@ -60,25 +60,33 @@ class YahooScraper:
                     continue
             
             # Check if min_price is not infinity
-            if min_price != float('inf'):
-                logger.info("Lowest price link found, navigating to it.")
-                min_price_link.click()
-                logger.info("button click")
-
-                # Wait for the new page to load and the price element to become visible
+            if min_price != float('inf') and min_price_link:
+                logger.info(f"Lowest price found: {min_price}")
+                
                 try:
-                    price_element = WebDriverWait(self.driver, TIMEOUT).until(
-                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                    )
-                    price = price_element[0].text.replace("円", "").replace(",", "").strip()
-                    logger.info(f"Price on new page: {price}")
+                    # Wait until the element is clickable
+                    WebDriverWait(self.driver, TIMEOUT).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a.Button")))
+                    min_price_link.click()
+                    logger.info("Button clicked successfully.")
+
+                    # Wait for new page price to load
+                    try:
+                        price_element = WebDriverWait(self.driver, TIMEOUT).until(
+                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        )
+                        price = price_element[0].text.replace("円", "").replace(",", "").strip()
+                        logger.info(f"Price on new page: {price}")
+                    except Exception as e:
+                        logger.error(f"Error while extracting price on new page: {e}")
+                        price = str(min_price)  # Fallback to previous price if not found
+                        logger.info(f"Fallback to min_price: {price}")
+
                 except Exception as e:
-                    logger.error(f"Error while extracting price on new page: {e}")
-                    price = str(min_price)  # Fallback to the previous price if not found
-                    logger.info(f"Fallback to min_price: {price}")
+                    logger.error(f"Error clicking the button: {e}")
             else:
-                logger.info("No valid price found.")
+                logger.info("No valid price found or no clickable link.")
                 price = "N/A"
+                
         except Exception as e:
             logger.error(f"Error in main process: {e}")
             price = "N/A"
