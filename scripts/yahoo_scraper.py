@@ -30,7 +30,7 @@ class YahooScraper:
 
         try:
             # Find all items
-            items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList_item")
+            items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
 
             print("===========items", items)
             
