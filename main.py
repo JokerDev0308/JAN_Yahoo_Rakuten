@@ -31,20 +31,30 @@ class PriceScraper:
             # Scrape prices concurrently
             with ThreadPoolExecutor(max_workers=3) as executor:
                 try:
+                    # Submit the scraping tasks
                     # amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
                     yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
                     # rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
                     # Wait for results
-                    # self.df.at[index, 'Amazon Price'] = amazon_future.result()
-                    self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
-                    # self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
-                
+                    # amazon_price = amazon_future.result()
+                    yahoo_price = yahoo_future.result()
+                    # rakuten_price = rakuten_future.result()
+
+                    # Only update the dataframe if the price is not None
+                    # if amazon_price is not None:
+                    #     self.df.at[index, 'Amazon Price'] = amazon_price
+                    if yahoo_price is not None:
+                        self.df.at[index, 'Yahoo Price'] = yahoo_price
+                    # if rakuten_price is not None:
+                    #     self.df.at[index, 'Rakuten Price'] = rakuten_price
+
                 except Exception as e:
                     print(f"Error scraping prices for JAN {jan}: {e}")
                     # self.df.at[index, 'Amazon Price'] = "Error"
                     self.df.at[index, 'Yahoo Price'] = "Error"
                     # self.df.at[index, 'Rakuten Price'] = "Error"
+
             
             # Calculate prices for current record
             self.calculate_prices_for_row(index)
