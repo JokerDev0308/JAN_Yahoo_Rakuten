@@ -53,8 +53,10 @@ class YahooScraper:
             if min_price != float('inf'):
                 
                 # Navigate to the page with lowest price
-                min_price_link.click()
                 print("min_price_link",min_price_link)
+                
+                min_price_link.click()
+                
                 # Wait for the new page to load and find the first price element
                 time.sleep(2)  # Give the page time to load
                 try:
