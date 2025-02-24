@@ -57,9 +57,9 @@ class PriceScraper:
             
     def calculate_prices_for_row(self, index):
         prices = [
-            self.df.at[index, 'Amazon Price'],
+            # self.df.at[index, 'Amazon Price'],
             self.df.at[index, 'Yahoo Price'],
-            self.df.at[index, 'Rakuten Price']
+            # self.df.at[index, 'Rakuten Price']
         ]
 
         # Filter out "N/A" values and convert valid prices to numeric
