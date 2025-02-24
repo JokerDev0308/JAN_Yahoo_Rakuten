@@ -78,10 +78,10 @@ class YahooScraper:
                 #     print("Fallback to min_price:", price)
             else:
                 print(1)
-                price = None
+                price = "N/A"
         except Exception:
             print(2)
-            price = None
+            price = "N/A"
         
         print(price)
 
