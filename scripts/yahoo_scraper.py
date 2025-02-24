@@ -54,7 +54,7 @@ class YahooScraper:
                 
                 # Navigate to the page with lowest price
                 print("min_price_link",min_price_link)
-                
+
                 min_price_link.click()
                 
                 # Wait for the new page to load and find the first price element
@@ -67,8 +67,10 @@ class YahooScraper:
                 except Exception:
                     price = str(min_price)  # Fallback to the previous price if not found
             else:
+                print(1)
                 price = "N/A"
         except Exception:
+            print(2)
             price = "N/A"
         
         print(price)
