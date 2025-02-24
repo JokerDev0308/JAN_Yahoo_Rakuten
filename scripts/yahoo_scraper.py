@@ -63,6 +63,7 @@ class YahooScraper:
             if min_price != float('inf'):
                 logger.info("Lowest price link found, navigating to it.")
                 min_price_link.click()
+                logger.info("button click")
 
                 # Wait for the new page to load and the price element to become visible
                 try:
