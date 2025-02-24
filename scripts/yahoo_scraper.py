@@ -43,8 +43,6 @@ class YahooScraper:
                 try:
                     price_element = item.find_element(By.CSS_SELECTOR, ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV")
                     current_price = int(price_element.text.replace("円", "").replace(",", "").strip())
-
-                    print(current_price)
                     
                     if current_price < min_price:
                         min_price = current_price
@@ -62,6 +60,8 @@ class YahooScraper:
                 try:
                     price_element = self.driver.find_element(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
                     price = price_element.text.replace("円", "").replace(",", "").strip()
+                    print(price)
+
                 except Exception:
                     price = str(min_price)  # Fallback to the previous price if not found
             else:
