@@ -69,7 +69,7 @@ class YahooScraper:
                     price_element = WebDriverWait(self.driver, TIMEOUT).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                     )
-                    price = price_element.text.replace("円", "").replace(",", "").strip()
+                    price = price_element[0].text.replace("円", "").replace(",", "").strip()
                     logger.info(f"Price on new page: {price}")
                 except Exception as e:
                     logger.error(f"Error while extracting price on new page: {e}")
