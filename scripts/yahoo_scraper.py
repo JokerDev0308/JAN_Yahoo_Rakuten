@@ -41,6 +41,8 @@ class YahooScraper:
                 try:
                     price_element = item.find_element(By.CSS_SELECTOR, ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV")
                     current_price = int(price_element.text.replace("円", "").replace(",", "").strip())
+
+                    print(current_price)
                     
                     if current_price < min_price:
                         min_price = current_price
