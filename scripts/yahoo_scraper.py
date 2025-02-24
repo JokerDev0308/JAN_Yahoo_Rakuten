@@ -31,6 +31,8 @@ class YahooScraper:
         try:
             # Find all items
             items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList_item")
+
+            print("===========items", items)
             
             # Initialize variables for tracking minimum price
             min_price = float('inf')
