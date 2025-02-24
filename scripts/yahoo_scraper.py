@@ -60,22 +60,22 @@ class YahooScraper:
                 min_price_link.click()
 
                 # Wait for the new page to load and the price element to become visible
-                try:
-                    # Wait until the price element is loaded on the new page (use an appropriate selector)
-                    WebDriverWait(self.driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                    )
+                # try:
+                # Wait until the price element is loaded on the new page (use an appropriate selector)
+                # WebDriverWait(self.driver, 10).until(
+                #     EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                # )
 
-                    # Try to find the price element and extract the price
-                    price_element = self.driver.find_element(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-                    price = price_element.text.replace("円", "").replace(",", "").strip()
-                    print(price)
+                # Try to find the price element and extract the price
+                price_element = self.driver.find_element(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+                price = price_element.text.replace("円", "").replace(",", "").strip()
+                print(price)
 
-                except Exception as e:
-                    # If an error occurs (e.g., element not found), print the error and fall back to min_price
-                    print(f"Error while extracting price: {e}")
-                    price = str(min_price)  # Fallback to the previous price if not found
-                    print("Fallback to min_price:", price)
+                # except Exception as e:
+                #     # If an error occurs (e.g., element not found), print the error and fall back to min_price
+                #     print(f"Error while extracting price: {e}")
+                #     price = str(min_price)  # Fallback to the previous price if not found
+                #     print("Fallback to min_price:", price)
             else:
                 print(1)
                 price = "N/A"
