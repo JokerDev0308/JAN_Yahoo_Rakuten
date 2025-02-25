@@ -60,40 +60,38 @@ class YahooScraper:
 
            
             if min_price != float('inf') and min_price_link:
-                logger.info(f"Lowest price found: {min_price}")
                 
                 try:
                     # Get the href attribute from the link
                     href = min_price_link.get_attribute('href')
-                    logger.info(f"Got href: {href}")
                     
                     # Navigate using JavaScript
                     self.driver.execute_script(f"window.location.href = '{href}';")
-                    logger.info("Navigation executed successfully")
-
-                    print("=================================")
-                    print(self.driver.page_source)
-                    print("=================================")
 
                     try:
                         # Wait for the page body to load first
                         WebDriverWait(self.driver, TIMEOUT).until(
                             EC.presence_of_element_located((By.TAG_NAME, "body"))
                         )
-                        logger.info("New page loaded successfully.")
 
                         # Scroll to trigger React rendering
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                         time.sleep(2)  # Give React some time to render
 
                         # Wait for the price element to be added to the DOM
-                        price_element = WebDriverWait(self.driver, TIMEOUT * 2).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        price_elements = WebDriverWait(self.driver, TIMEOUT * 2).until(
+                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                         )
                         
-                        # Extract the price text
-                        price = price_element.text.replace("円", "").replace(",", "").strip()
-                        logger.info(f"Extracted price: {price}")
+                        if price_elements:
+                            # Get the first price element
+                            price_element = price_elements[0]
+                            
+                            # Extract the price text
+                            price = price_element.text.replace("円", "").replace(",", "").strip()
+                        else:
+                            logger.warning("No price elements found.")
+                            price = str(min_price)
 
                     except Exception as e:
                         logger.error(f"Price not found after waiting: {e}")
