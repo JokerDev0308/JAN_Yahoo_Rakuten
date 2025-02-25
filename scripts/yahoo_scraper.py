@@ -52,7 +52,7 @@ class YahooScraper:
                     
                     if current_price < min_price:
                         min_price = current_price
-                        min_price_link = item.find_element(By.CSS_SELECTOR, "a.SearchResult_SearchResult__detailsContainerLink__HrJQL")
+                        min_price_link = item.find_element(By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT")
 
                 except Exception as e:
                     logger.warning(f"Error finding price in item: {e}")
@@ -79,7 +79,7 @@ class YahooScraper:
                         time.sleep(2)  # Give React some time to render
 
                         print("==========================")
-                        print(self.driver.page_source)
+                        # print(self.driver.page_source)
                         print("==========================")
 
                         # Wait for the price element to be added to the DOM
