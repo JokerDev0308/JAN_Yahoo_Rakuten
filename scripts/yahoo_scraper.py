@@ -71,7 +71,7 @@ class YahooScraper:
                     print("==========================")
                     if min_price_link:
                         # Print the HTML of min_price_link
-                        print(self.page_source)
+                        print(self.driver.page_source)
                     else:
                         print("No valid min_price_link found.")
                     print("==========================")
