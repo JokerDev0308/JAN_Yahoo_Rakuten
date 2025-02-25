@@ -80,8 +80,11 @@ class YahooScraper:
 
                         logger.info("page scrolled successfully.")
 
+                        print("==========================")
                         # Wait for price element
                         price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+                        print(price_elements)
+                        print("==========================")
 
                         if price_elements:
                             all_prices = [p.text for p in price_elements]
