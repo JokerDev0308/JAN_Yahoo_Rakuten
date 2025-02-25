@@ -52,7 +52,7 @@ class YahooScraper:
                     
                     if current_price < min_price:
                         min_price = current_price
-                        min_price_link = item.find_element(By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT")
+                        min_price_link = item.find_element_by_css_selector("a.SearchResult_SearchResult__cheapestButton__SFFlT")
 
                 except Exception as e:
                     logger.warning(f"Error finding price in item: {e}")
@@ -62,8 +62,8 @@ class YahooScraper:
                 logger.info(f"Lowest price found: {min_price}")
                 
                 try:
-                    self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", min_price_link)
-                    time.sleep(1)  # Short wait before clicking
+                    # self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", min_price_link)
+                    # time.sleep(1)  # Short wait before clicking
                     min_price_link.click()
                     logger.info("Navigated to the lowest-priced product.")
 
