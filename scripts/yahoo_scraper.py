@@ -52,24 +52,21 @@ class YahooScraper:
                     
                     if current_price < min_price:
                         min_price = current_price
-                        # Find the link element within this item
                         min_price_link = item.find_element(By.CSS_SELECTOR, "a.Button")
                 
                 except Exception as e:
                     logger.warning(f"Error finding price in item: {e}")
                     continue
             
-            # Check if min_price is not infinity
+            price = "N/A"  # Default value moved here
             if min_price != float('inf') and min_price_link:
                 logger.info(f"Lowest price found: {min_price}")
                 
                 try:
-                    # Wait until the element is clickable
                     WebDriverWait(self.driver, TIMEOUT).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a.Button")))
                     min_price_link.click()
                     logger.info("Button clicked successfully.")
 
-                    # Wait for new page price to load
                     try:
                         price_element = WebDriverWait(self.driver, TIMEOUT).until(
                             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
@@ -78,15 +75,15 @@ class YahooScraper:
                         logger.info(f"Price on new page: {price}")
                     except Exception as e:
                         logger.error(f"Error while extracting price on new page: {e}")
-                        price = str(min_price)  # Fallback to previous price if not found
+                        price = str(min_price)
                         logger.info(f"Fallback to min_price: {price}")
 
                 except Exception as e:
                     logger.error(f"Error clicking the button: {e}")
+                    price = str(min_price)  # Fallback if click fails
             else:
                 logger.info("No valid price found or no clickable link.")
-                price = "N/A"
-                
+
         except Exception as e:
             logger.error(f"Error in main process: {e}")
             price = "N/A"
