@@ -78,14 +78,16 @@ class YahooScraper:
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                         time.sleep(2)  # Give React some time to render
 
+                        print("==========================")
+                        print(self.driver.page_source)
+                        print("==========================")
+
                         # Wait for the price element to be added to the DOM
                         price_element = WebDriverWait(self.driver, TIMEOUT * 2).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                         )
 
-                        print("==========================")
-                        print(price)
-                        print("==========================")
+                        
                         
                         # Extract the price text
                         price = price_element.text.replace("円", "").replace(",", "").strip()
