@@ -59,7 +59,11 @@ class YahooScraper:
                     continue
 
             print("==========================")
-            print(min_price_link)
+            if min_price_link:
+                # Print the HTML of min_price_link
+                print(min_price_link.get_attribute('outerHTML'))
+            else:
+                print("No valid min_price_link found.")
             print("==========================")
             exit()
 
