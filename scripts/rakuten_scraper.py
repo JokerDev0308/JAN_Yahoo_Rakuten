@@ -1,9 +1,15 @@
-import time
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from config import HEADLESS, TIMEOUT, CHROMEDRIVER_PATH
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class RakutenScraper:
     def __init__(self):
@@ -13,6 +19,11 @@ class RakutenScraper:
         options = Options()
         if HEADLESS:
             options.add_argument("--headless")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.binary_location = "/usr/bin/google-chrome"  # Update if necessary
+            options.add_argument("--remote-debugging-port=9222")
+        
         service = Service(CHROMEDRIVER_PATH)
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(TIMEOUT)
