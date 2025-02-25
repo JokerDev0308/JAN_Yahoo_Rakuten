@@ -33,80 +33,60 @@ class YahooScraper:
         if not self.driver:
             self.setup_driver()
 
-        url = f"https://shopping.yahoo.co.jp/search?p={jan_code}"
-        self.driver.get(url)
-
         try:
-            # Find all items
-            items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
+            self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
+            
+            # Find all items in one go
+            items = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".LoopList__item"))
+            )
 
-            # Initialize variables for tracking minimum price
             min_price = float('inf')
             min_price_link = None
-            
-            # Loop through items to find the lowest price
+
+            # Process items more efficiently
             for item in items:
                 try:
-                    price_element = item.find_element(By.CSS_SELECTOR, ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV")
-                    current_price = int(price_element.text.replace("円", "").replace(",", "").strip())
+                    price_text = item.find_element(By.CSS_SELECTOR, 
+                        ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV").text
+                    current_price = int(price_text.translate(str.maketrans("", "", "円,")))
                     
                     if current_price < min_price:
                         min_price = current_price
-                        min_price_link = item.find_element(By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT")
-
-                except Exception as e:
-                    logger.warning(f"Error finding price in item: {e}")
+                        temp = item.find_element(By.CSS_SELECTOR, 
+                            "a.SearchResult_SearchResult__cheapestButton__SFFlT")
+                        if temp:
+                            min_price_link = temp
+                
+                except (ValueError, Exception) as e:
+                    logger.debug(f"Skipping item due to: {e}")
                     continue
 
-           
             if min_price != float('inf') and min_price_link:
-                
                 try:
-                    # Get the href attribute from the link
-                    href = min_price_link.get_attribute('href')
+                    self.driver.get(min_price_link.get_attribute('href'))
                     
-                    # Navigate using JavaScript
-                    self.driver.execute_script(f"window.location.href = '{href}';")
-
-                    try:
-                        # Wait for the page body to load first
-                        WebDriverWait(self.driver, TIMEOUT).until(
-                            EC.presence_of_element_located((By.TAG_NAME, "body"))
-                        )
-
-                        # Scroll to trigger React rendering
-                        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                        time.sleep(2)  # Give React some time to render
-
-                        # Wait for the price element to be added to the DOM
-                        price_elements = WebDriverWait(self.driver, TIMEOUT * 2).until(
-                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                        )
+                    # Wait and find price elements
+                    price_elements = WebDriverWait(self.driver, TIMEOUT).until(
+                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                    )
+                    
+                    if price_elements:
+                        price = price_elements[0].text.translate(str.maketrans("", "", "円,"))
+                    else:
+                        price = str(min_price)
                         
-                        if price_elements:
-                            # Get the first price element
-                            price_element = price_elements[0]
-                            
-                            # Extract the price text
-                            price = price_element.text.replace("円", "").replace(",", "").strip()
-                        else:
-                            logger.warning("No price elements found.")
-                            price = str(min_price)
-
-                    except Exception as e:
-                        logger.error(f"Price not found after waiting: {e}")
-                        price = str(min_price)  # Fallback
-
                 except Exception as e:
-                    logger.error(f"Error navigating to link: {e}")
-                    price = str(min_price)  # Fallback if navigation fails
-
+                    logger.warning(f"Using fallback price due to: {e}")
+                    price = str(min_price)
+            else:
+                price = str(min_price) if min_price != float('inf') else "N/A"
 
         except Exception as e:
-            logger.error(f"Error in main process: {e}")
+            logger.error(f"Scraping failed: {e}")
             price = "N/A"
-        
-        logger.info(f"Final price: {price}")
+
+        logger.info(f"Final price for {jan_code}: {price}")
         return price
 
     def close(self):
