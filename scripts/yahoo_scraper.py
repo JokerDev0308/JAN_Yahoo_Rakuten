@@ -63,20 +63,17 @@ class YahooScraper:
                 logger.info(f"Lowest price found: {min_price}")
                 
                 try:
+                    # Get the href attribute from the link
+                    href = min_price_link.get_attribute('href')
+                    logger.info(f"Got href: {href}")
                     
-                    # Now, click the element
-                    self.driver.execute_script("arguments[0].click();", min_price_link)
-                    print("Click event performed successfully!")
+                    # Navigate using JavaScript
+                    self.driver.execute_script(f"window.location.href = '{href}';")
+                    logger.info("Navigation executed successfully")
 
-                    print("==========================")
-                    if min_price_link:
-                        # Print the HTML of min_price_link
-                        print(self.driver.page_source)
-                    else:
-                        print("No valid min_price_link found.")
-                    print("==========================")
-                    exit()
-
+                    print("=================================")
+                    print(self.driver.page_source)
+                    print("=================================")
 
                     try:
                         # Wait for the page body to load first
@@ -85,19 +82,14 @@ class YahooScraper:
                         )
                         logger.info("New page loaded successfully.")
 
-                       
                         # Scroll to trigger React rendering
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                         time.sleep(2)  # Give React some time to render
-
-                        
 
                         # Wait for the price element to be added to the DOM
                         price_element = WebDriverWait(self.driver, TIMEOUT * 2).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                         )
-
-                        
                         
                         # Extract the price text
                         price = price_element.text.replace("円", "").replace(",", "").strip()
@@ -108,8 +100,8 @@ class YahooScraper:
                         price = str(min_price)  # Fallback
 
                 except Exception as e:
-                    logger.error(f"Error clicking the link: {e}")
-                    price = str(min_price)  # Fallback if click fails
+                    logger.error(f"Error navigating to link: {e}")
+                    price = str(min_price)  # Fallback if navigation fails
 
 
         except Exception as e:
