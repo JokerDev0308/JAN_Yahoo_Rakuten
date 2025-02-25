@@ -68,35 +68,32 @@ class YahooScraper:
                     logger.info("Navigated to the lowest-priced product.")
 
                     try:
-                        # Ensure the page has loaded
+                        # Wait for the page body to load first
                         WebDriverWait(self.driver, TIMEOUT).until(
                             EC.presence_of_element_located((By.TAG_NAME, "body"))
                         )
                         logger.info("New page loaded successfully.")
 
+                        # Scroll to trigger React rendering
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                        time.sleep(2)  # Give React some time to render
+
+                        # Wait for the price element to be added to the DOM
+                        price_element = WebDriverWait(self.driver, TIMEOUT * 2).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        )
+
+                        print("==========================")
+                        print(price)
+                        print("==========================")
                         
-                        time.sleep(1)
-
-                        logger.info("page scrolled successfully.")
-
-                        print("==========================")
-                        # Wait for price element
-                        price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-                        print(self.driver.page_source)
-                        print("==========================")
-
-                        if price_elements:
-                            all_prices = [p.text for p in price_elements]
-                            logger.info(f"Extracted prices: {all_prices}")
-                            price = all_prices[0]  # Select the first price
-                        else:
-                            logger.error("Price element not found.")
-                            price = str(min_price)  # Fallback
+                        # Extract the price text
+                        price = price_element.text.replace("円", "").replace(",", "").strip()
+                        logger.info(f"Extracted price: {price}")
 
                     except Exception as e:
-                        logger.error(f"Error extracting price: {e}")
-                        price = str(min_price)  # Fallback if not found
+                        logger.error(f"Price not found after waiting: {e}")
+                        price = str(min_price)  # Fallback
 
                 except Exception as e:
                     logger.error(f"Error clicking the link: {e}")
