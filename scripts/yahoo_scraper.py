@@ -79,13 +79,15 @@ class YahooScraper:
                         time.sleep(1)
 
                         # Wait for price element
-                        price_element = WebDriverWait(self.driver, TIMEOUT).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                        )
-                        
-                        # Extract price
-                        price = price_element.text.replace("円", "").replace(",", "").strip()
-                        logger.info(f"Extracted price: {price}")
+                        price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+
+                        if price_elements:
+                            all_prices = [p.text for p in price_elements]
+                            logger.info(f"Extracted prices: {all_prices}")
+                            price = all_prices[0]  # Select the first price
+                        else:
+                            logger.error("Price element not found.")
+                            price = str(min_price)  # Fallback
 
                     except Exception as e:
                         logger.error(f"Error extracting price: {e}")
