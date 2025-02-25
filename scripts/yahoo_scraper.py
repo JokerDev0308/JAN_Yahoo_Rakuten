@@ -58,23 +58,25 @@ class YahooScraper:
                     logger.warning(f"Error finding price in item: {e}")
                     continue
 
-            print("==========================")
-            if min_price_link:
-                # Print the HTML of min_price_link
-                print(min_price_link.get_attribute('outerHTML'))
-            else:
-                print("No valid min_price_link found.")
-            print("==========================")
-            exit()
-
+           
             if min_price != float('inf') and min_price_link:
                 logger.info(f"Lowest price found: {min_price}")
                 
                 try:
-                    # self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", min_price_link)
-                    # time.sleep(1)  # Short wait before clicking
+                    WebDriverWait(self.driver, 60).until(EC.element_to_be_clickable(min_price_link))
+                    # Now, click the element
                     min_price_link.click()
-                    logger.info("Navigated to the lowest-priced product.")
+                    print("Click event performed successfully!")
+
+                    print("==========================")
+                    if min_price_link:
+                        # Print the HTML of min_price_link
+                        print(self.page_source)
+                    else:
+                        print("No valid min_price_link found.")
+                    print("==========================")
+                    exit()
+
 
                     try:
                         # Wait for the page body to load first
