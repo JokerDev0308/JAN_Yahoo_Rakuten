@@ -74,13 +74,15 @@ class YahooScraper:
                         )
                         logger.info("New page loaded successfully.")
 
+                        print("==========================")
+                        # print(self.driver.page_source)
+                        print("==========================")
+                        exit()
                         # Scroll to trigger React rendering
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                         time.sleep(2)  # Give React some time to render
 
-                        print("==========================")
-                        # print(self.driver.page_source)
-                        print("==========================")
+                        
 
                         # Wait for the price element to be added to the DOM
                         price_element = WebDriverWait(self.driver, TIMEOUT * 2).until(
