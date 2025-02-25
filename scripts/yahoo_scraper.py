@@ -83,7 +83,7 @@ class YahooScraper:
                         print("==========================")
                         # Wait for price element
                         price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-                        print(price_elements)
+                        print(self.driver.page_source)
                         print("==========================")
 
                         if price_elements:
