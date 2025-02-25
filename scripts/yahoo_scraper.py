@@ -68,15 +68,24 @@ class YahooScraper:
                     logger.info("Navigated to the lowest-priced product.")
 
                     try:
-                        price_element = WebDriverWait(self.driver, TIMEOUT).until(
-                            EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        # Ensure the page has loaded
+                        WebDriverWait(self.driver, TIMEOUT).until(
+                            EC.presence_of_element_located((By.TAG_NAME, "body"))
                         )
-                        price = price_element[0].text.replace("円", "").replace(",", "").strip()
-                        logger.info(f"Price on new page: {price}")
+                        logger.info("New page loaded successfully.")
+
+                        # Wait for price element
+                        price_element = WebDriverWait(self.driver, TIMEOUT).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                        )
+                        
+                        # Extract price
+                        price = price_element.text.replace("円", "").replace(",", "").strip()
+                        logger.info(f"Extracted price: {price}")
+
                     except Exception as e:
-                        logger.error(f"Error while extracting price on new page: {e}")
-                        price = str(min_price)
-                        logger.info(f"Fallback to min_price: {price}")
+                        logger.error(f"Error extracting price: {e}")
+                        price = str(min_price)  # Fallback if not found
 
                 except Exception as e:
                     logger.error(f"Error clicking the link: {e}")
