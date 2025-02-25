@@ -68,11 +68,17 @@ class YahooScraper:
                     logger.info("Button clicked successfully.")
 
                     try:
-                        price_element = WebDriverWait(self.driver, TIMEOUT).until(
+                        price_elements = WebDriverWait(self.driver, TIMEOUT).until(
                             EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                         )
-                        price = price_element[0].text.replace("円", "").replace(",", "").strip()
-                        logger.info(f"Price on new page: {price}")
+
+                        all_prices = [p.text.replace("円", "").replace(",", "").strip() for p in price_elements]
+                        logger.info(f"Extracted prices: {all_prices}")
+
+                        if all_prices:
+                            price = all_prices[0]  # Pick the first one if available
+                        else:
+                            price = str(min_price)  # Fallback if no price found
                     except Exception as e:
                         logger.error(f"Error while extracting price on new page: {e}")
                         price = str(min_price)
