@@ -52,11 +52,16 @@ class YahooScraper:
                     
                     if current_price < min_price:
                         min_price = current_price
-                        min_price_link = item.find_element_by_css_selector("a.SearchResult_SearchResult__cheapestButton__SFFlT")
+                        min_price_link = item.find_element(By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT")
 
                 except Exception as e:
                     logger.warning(f"Error finding price in item: {e}")
                     continue
+
+            print("==========================")
+            print(min_price_link)
+            print("==========================")
+            exit()
 
             if min_price != float('inf') and min_price_link:
                 logger.info(f"Lowest price found: {min_price}")
@@ -74,10 +79,7 @@ class YahooScraper:
                         )
                         logger.info("New page loaded successfully.")
 
-                        print("==========================")
-                        print(self.driver.page_source)
-                        print("==========================")
-                        exit()
+                       
                         # Scroll to trigger React rendering
                         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                         time.sleep(2)  # Give React some time to render
