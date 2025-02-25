@@ -78,6 +78,8 @@ class YahooScraper:
                         
                         time.sleep(1)
 
+                        logger.info("page scrolled successfully.")
+
                         # Wait for price element
                         price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
 
