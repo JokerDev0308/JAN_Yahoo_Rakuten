@@ -63,6 +63,9 @@ class YahooScraper:
                 logger.info(f"Lowest price found: {min_price}")
                 
                 try:
+                    self.driver.execute_script("arguments[0].scrollIntoView();", min_price_link)
+                    time.sleep(1)  # Wait briefly
+                    min_price_link.click()
                     WebDriverWait(self.driver, TIMEOUT).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a.Button")))
                     min_price_link.click()
                     logger.info("Button clicked successfully.")
