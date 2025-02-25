@@ -74,6 +74,10 @@ class YahooScraper:
                         )
                         logger.info("New page loaded successfully.")
 
+                        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                        
+                        time.sleep(1)
+
                         # Wait for price element
                         price_element = WebDriverWait(self.driver, TIMEOUT).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
