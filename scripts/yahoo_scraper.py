@@ -75,7 +75,7 @@ class YahooScraper:
                         logger.info("New page loaded successfully.")
 
                         print("==========================")
-                        # print(self.driver.page_source)
+                        print(self.driver.page_source)
                         print("==========================")
                         exit()
                         # Scroll to trigger React rendering
