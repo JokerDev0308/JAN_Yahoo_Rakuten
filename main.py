@@ -20,7 +20,7 @@ class PriceScraper:
         try:
             total_records = len(self.df)
             for index, row in self.df.iterrows():
-                while not config.RUNNING:
+                while not self.running:
                     print("Running was stopped")
                     return False
 
@@ -57,6 +57,9 @@ class PriceScraper:
             # Ensure all drivers are closed properly
             self.yahoo_scraper.driver.quit()
             self.rakuten_scraper.driver.quit()
+
+    def running(self):
+       return os.path.exists(config.RUNNING)
 
     def calculate_prices_for_row(self, index):
         prices = [
@@ -96,7 +99,7 @@ class PriceScraper:
 
 def main():
     try:
-        while config.RUNNING:
+        while True:
             scraper = PriceScraper()
             scraper.load_data()
             scraper.scrape_running()

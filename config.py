@@ -6,5 +6,5 @@ JANCODE_SCV = 'data/jan_codes.csv'
 JANCODE_YH_AFFILI_SCV = 'data/jan_YH_afiil_codes.csv'
 OUTPUT_XLSX = 'data/scraped_prices.xlsx'
 
-RUNNING = True
+RUNNING = "tmp/running"
 WAITING = False

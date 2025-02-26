@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import config
+import os
+from pathlib import Path
 
 st.set_page_config(
     page_title="JANコード価格スクレーパーモニター",
@@ -12,6 +14,7 @@ st.set_page_config(
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
+        self.Running = False
         
     def setup_sidebar(self):
         with st.sidebar:
@@ -50,13 +53,23 @@ class PriceScraperUI:
     def _setup_scraping_controls(self):
         st.subheader("スクレイピング制御")
 
-        if config.RUNNING:
+        if self.running:
             st.sidebar.button("停 止", type="primary", use_container_width=True,
-                            on_click=lambda: setattr(config, 'RUNNING', False))
+                            on_click=self.stop_running)
         else:
             st.sidebar.button("開 始", type="secondary", use_container_width=True,
-                            on_click=lambda: setattr(config, 'RUNNING', True))
-            
+                            on_click=self.start_running)
+
+    def running(self):
+       return os.path.exists(config.RUNNING) 
+    
+    def start_running(self):
+        with open(config.RUNNING, 'w') as file:
+            file.write('')
+
+    def stop_running(self):
+        file_path = Path(config.OUTPUT_XLSX)
+        file_path.unlink()
 
     def display_main_content(self):
         
