@@ -26,7 +26,7 @@ class PriceScraper:
 
                 jan = row['JAN']
 
-                yh_url = row['YahooLink'] if row['YahooLink'] else None
+                yh_url = row.get('YahooLink') if pd.notna(row.get('YahooLink')) else None
 
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
 
