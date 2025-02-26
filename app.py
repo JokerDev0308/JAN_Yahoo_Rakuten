@@ -80,7 +80,6 @@ class PriceScraperUI:
             st.warning("No scraped data available yet.")
 
     def run(self):
-        st.title(self.title)
         self.setup_sidebar()
 
         tab1, tab2 = st.tabs([ "Result", "JAN Code"])
