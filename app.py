@@ -16,6 +16,11 @@ class PriceScraperUI:
     def setup_sidebar(self):
         with st.sidebar:
             self._setup_scraping_controls()
+
+            if st.button('Reload', use_container_width=True):
+                st.rerun()
+            
+            self.download_excel()
             
 
     def _handle_file_upload(self):
@@ -55,7 +60,7 @@ class PriceScraperUI:
             
 
     def display_main_content(self):
-        st.write("### Scraped Prices")
+        
         try:
             df = pd.read_excel(config.OUTPUT_XLSX)
             df.index = df.index + 1
@@ -63,36 +68,29 @@ class PriceScraperUI:
             st.dataframe(df, use_container_width=True, height=height, key = "result")
             
         except FileNotFoundError:
-            st.warning("No scraped data available yet.")
+            st.warning("スクレイピングされたデータはまだない。")
 
     def download_excel(self):
         try:
             # Provide an option to download the existing Excel file directly
             with open(config.OUTPUT_XLSX, "rb") as file:
                 st.download_button(
-                    label="Download Scraped Data",
+                    label="ダウンロード",
                     data=file,
                     file_name="scraped_data.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True
                 )
                 
         except FileNotFoundError:
-            st.warning("No scraped data available yet.")
+            st.warning("スクレイピングされたデータはまだない。")
 
     def run(self):
         self.setup_sidebar()
 
-        tab1, tab2 = st.tabs([ "Result", "JAN Code"])
+        tab1, tab2 = st.tabs([ "スクラップ価格", "JANコードデータ"])
 
         with tab1:
-
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button('Reload'):
-                    st.rerun()
-            with col2:
-                self.download_excel()
-
             self.display_main_content()
 
         with tab2:

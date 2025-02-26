@@ -29,7 +29,7 @@ class PriceScraper:
                     print("Running was stopped")
                     return
                 
-                
+
 
                 jan = row['JAN']
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
@@ -46,7 +46,7 @@ class PriceScraper:
                     self.calculate_prices_for_row(index)
 
                     self.df.at[index, 'Yahoo! Link'] = yahoo_product["url"]
-                    self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d')
+                    self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
                 
                 
