@@ -31,18 +31,17 @@ class RakutenScraper:
     def scrape_price(self, jan_code):
         if not self.driver:
             self.setup_driver()
-            
-        url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?ran=1001000{jan_code}&s=11&used=0/"
-        self.driver.get(url)
-
         try:
-            price_element = self.driver.find_element(By.CSS_SELECTOR, ".price--3zUvK")
-            price = price_element[0].text().strip()
-
+            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?ran=1001000{jan_code}&s=11&used=0/")
+            
+            # Find all items in one go
+            items = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price--3zUvK"))
+            )
+            price = items[0].text().strip()
             print("Rakuten Price:", price)
-        except Exception:
-            price = "N/A"
-
+        except Exception as e:
+            logger.error(f"Scraping failed: {e}")
         return price
 
     def close(self):
