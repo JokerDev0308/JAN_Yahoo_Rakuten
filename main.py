@@ -50,7 +50,7 @@ class PriceScraper:
             self.calculate_prices_for_row(index)
             
             # Save intermediate results
-            if (index + 1) % 8 == 0:
+            if (index + 1) % 50 == 0 and (index+1 ) == total_records:
                 self.save_results()
 
             sleep(2)
