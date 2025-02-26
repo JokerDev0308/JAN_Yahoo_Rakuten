@@ -89,14 +89,8 @@ class PriceScraper:
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
     def save_yh_product_url_to_jancode(self):
-        column_name_mapping = {
-            'JAN': 'JAN',
-            'price': '価格',
-            'YahooLink': 'Yahooリンク'
-        }
-
-        self.df.rename(columns=column_name_mapping, inplace=True)
-        self.df.to_excel(config.OUTPUT_XLSX, index=False)
+        self.df.rename(columns=["JAN", 'price', "YahopLink"], inplace=True)
+        self.df.to_csv(config.OUTPUT_XLSX, index=False)
 
 def main():
     try:
