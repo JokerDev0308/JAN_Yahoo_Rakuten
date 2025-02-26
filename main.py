@@ -25,7 +25,7 @@ class PriceScraper:
         try:
             total_records = len(self.df)
             for index, row in self.df.iterrows():
-                while not config.RUNNING:
+                while not self.running():
                     print("Running was stopped")
                     return
 
@@ -94,10 +94,12 @@ class PriceScraper:
         
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
+    def running(self):
+       return os.path.exists(config.RUNNING)
 
 def main():
     try:
-        while config.RUNNING:
+        while True:
             scraper = PriceScraper()
             scraper.load_data()
             scraper.scrape_running()
