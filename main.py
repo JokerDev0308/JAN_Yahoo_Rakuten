@@ -34,8 +34,13 @@ class PriceScraper:
                     yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
                     rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
-                    self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
+                    yahoo_product = yahoo_future.result()
+
+                    
+                    self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
+
+                    self.df.at[index, 'Yahoo! Link'] = yahoo_product["price"]
                 
                 self.calculate_prices_for_row(index)
                 

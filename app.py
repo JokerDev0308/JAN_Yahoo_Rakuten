@@ -8,7 +8,6 @@ class PriceScraperUI:
         
     def setup_sidebar(self):
         with st.sidebar:
-            self._handle_file_upload()
             self._setup_scraping_controls()
             if st.button("Refresh"):
                 st.rerun()
@@ -27,11 +26,11 @@ class PriceScraperUI:
         st.write("### Scraping Control")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Start Scraping"):
+            if st.button("Start Scraping",use_container_width=True):
                 st.session_state.scraping = True
                 st.success("Scraping started!")
         with col2:
-            if st.button("Stop Scraping"):
+            if st.button("Stop Scraping",use_container_width=True):
                 st.session_state.scraping = False
                 st.error("Scraping stopped!")
 
@@ -39,17 +38,38 @@ class PriceScraperUI:
         st.write("### Scraped Prices")
         try:
             df = pd.read_excel(OUTPUT_XLSX)
-            st.dataframe(df)
+            df.index = df.index + 1
+            height = min(len(df) * 35 + 38, 800)
+            st.dataframe(df, use_container_width=True, height=height, key = "result")
             
-            st.write("### Statistics")
-            st.write(df.describe())
+        except FileNotFoundError:
+            st.warning("No scraped data available yet.")
+
+    def download_excel(self):
+        try:
+            # Provide an option to download the existing Excel file directly
+            with open(OUTPUT_XLSX, "rb") as file:
+                st.download_button(
+                    label="Download Scraped Data",
+                    data=file,
+                    file_name="scraped_data.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+                
         except FileNotFoundError:
             st.warning("No scraped data available yet.")
 
     def run(self):
         st.title(self.title)
         self.setup_sidebar()
-        self.display_main_content()
+
+        tab1, tab2 = st.tabs([ "Result", "JAN Code"])
+
+        with tab1:
+            self.download_excel()
+            self.display_main_content()
+        with tab2:
+            self._handle_file_upload()
 
 # Initialize and run the app
 app = PriceScraperUI()

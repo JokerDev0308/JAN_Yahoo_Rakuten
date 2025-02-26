@@ -15,6 +15,7 @@ class YahooScraper:
         self.driver = WebDriverManager.get_driver("yahoo")
 
     def scrape_price(self, jan_code):
+        product = {}
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
@@ -25,15 +26,16 @@ class YahooScraper:
             if not items:
                 return "N/A"
 
-            product_url = items[0].get_attribute('href')
-            self.driver.get(product_url)
+            product['url'] = items[0].get_attribute('href')
+            self.driver.get(product['url'])
 
             price_elements = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
             
             if price_elements:
-                return price_elements[0].text.translate(str.maketrans("", "", "円,"))
+                product["price"] = price_elements[0].text.translate(str.maketrans("", "", "円,"))
+                return product
             
             return "N/A"
 
