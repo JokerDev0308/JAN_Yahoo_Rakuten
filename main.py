@@ -68,10 +68,9 @@ class PriceScraper:
 
         if valid_prices:
             min_price = min(valid_prices)
+            self.df.at[index, 'Price Difference'] = float(self.df.at[index, 'price']) - min_price
         else:
-            min_price = "N/A"
-
-        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - min_price
+            self.df.at[index, 'Price Difference'] = "N/A"
 
     def save_results(self):
         column_name_mapping = {
@@ -91,14 +90,10 @@ class PriceScraper:
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
     def save_yh_product_url_to_jancode(self):
-        self.df.rename(columns={
-            'JAN': 'JAN（マスタ）',
-            'price': '価格（マスタ）',
-            'YahooLink': 'YahooLink'
-        }, inplace=True)
-
-        self.df.to_csv(config.OUTPUT_XLSX, index=False)
-
+        columns_to_keep = ['JAN', 'price', 'YahooLink']
+        self.df = self.df[columns_to_keep]
+        self.df.to_csv(config.JANCODE_SCV, index=False)
+        
 def main():
     try:
         while config.RUNNING:
