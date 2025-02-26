@@ -1,4 +1,6 @@
 import pandas as pd
+
+from scripts.webdriver_manager import WebDriverManager
 # from scripts.amazon_scraper import AmazonScraper
 from scripts.yahoo_scraper import YahooScraper
 from scripts.rakuten_scraper import RakutenScraper
@@ -19,41 +21,30 @@ class PriceScraper:
         self.df = pd.read_csv(JANCODE_SCV)
     
     def scrape_running(self):
-        total_records = len(self.df)
-        for index, row in self.df.iterrows():
-            while WAITING:
-                sleep(1)
-                continue
+        try:
+            total_records = len(self.df)
+            for index, row in self.df.iterrows():
+                while WAITING:
+                    sleep(1)
 
-            jan = row['JAN']
-            print(f"Processing {index + 1}/{total_records}: JAN {jan}")
-            
-            # Scrape prices concurrently
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                try:
-                    # amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
+                jan = row['JAN']
+                print(f"Processing {index + 1}/{total_records}: JAN {jan}")
+                
+                with ThreadPoolExecutor(max_workers=2) as executor:
                     yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
                     rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
-                    # Wait for results
-                    # self.df.at[index, 'Amazon Price'] = amazon_future.result()
                     self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                 
-                except Exception as e:
-                    print(f"Error scraping prices for JAN {jan}: {e}")
-                    # self.df.at[index, 'Amazon Price'] = "Error"
-                    self.df.at[index, 'Yahoo Price'] = "Error"
-                    self.df.at[index, 'Rakuten Price'] = "Error"
-            
-            # Calculate prices for current record
-            self.calculate_prices_for_row(index)
-            
-            # Save intermediate results
-            if (index + 1) % 50 == 0 and (index+1 ) == total_records:
-                self.save_results()
+                self.calculate_prices_for_row(index)
+                
+                if (index + 1) % 10 == 0:  # Save more frequently
+                    self.save_results()
 
-            sleep(2)
+                sleep(1)  # Reduced sleep time
+        finally:
+            WebDriverManager.close_all()  # Ensure all drivers are closed
             
     def calculate_prices_for_row(self, index):
         prices = [
@@ -81,12 +72,14 @@ class PriceScraper:
         print(f"Progress saved to {OUTPUT_XLSX}")
 
 def main():
-    while RUNNING:
-        scraper = PriceScraper()
-        scraper.load_data()
-        scraper.scrape_running()
-        
-        sleep(10)
+    try:
+        while RUNNING:
+            scraper = PriceScraper()
+            scraper.load_data()
+            scraper.scrape_running()
+            sleep(5)
+    except KeyboardInterrupt:
+        WebDriverManager.close_all()
 
 if __name__ == "__main__":
     main()

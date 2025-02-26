@@ -1,11 +1,9 @@
 import logging
-from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from config import HEADLESS, TIMEOUT, CHROMEDRIVER_PATH
+from config import TIMEOUT
+from .webdriver_manager import WebDriverManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,64 +11,34 @@ logger = logging.getLogger(__name__)
 
 class YahooScraper:
     def __init__(self):
-        self.driver = None
-
-    def setup_driver(self):
-        options = Options()
-        if HEADLESS:
-            options.add_argument("--headless")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.binary_location = "/usr/bin/google-chrome"  # Update if necessary
-            options.add_argument("--remote-debugging-port=9222")
-        
-        service = Service(CHROMEDRIVER_PATH)
-        self.driver = webdriver.Chrome(service=service, options=options)
-        self.driver.implicitly_wait(TIMEOUT)
+        self.driver = WebDriverManager.get_driver("yahoo")
 
     def scrape_price(self, jan_code):
-        if not self.driver:
-            self.setup_driver()
-
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            # Find all items in one go
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
 
-            prodcut_url = items[0].get_attribute('href')
+            if not items:
+                return "N/A"
 
-            print(prodcut_url)
-
-            min_price = float('inf')
-
-            try:
-                self.driver.get(prodcut_url)
-                
-                # Wait and find price elements
-                price_elements = WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                )
-                
-                if price_elements:
-                    price = price_elements[0].text.translate(str.maketrans("", "", "円,"))
-                else:
-                    price = str(min_price)
-                    
-            except Exception as e:
-                logger.warning(f"Using fallback price due to: {e}")
-                price = str(min_price)
+            product_url = items[0].get_attribute('href')
+            self.driver.get(product_url)
+            
+            price_elements = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+            )
+            
+            if price_elements:
+                return price_elements[0].text.translate(str.maketrans("", "", "円,"))
+            
+            return "N/A"
 
         except Exception as e:
-            logger.error(f"Scraping failed: {e}")
-            price = "N/A"
-
-        logger.info(f"Final price for {jan_code}: {price}")
-        return price
+            logger.error(f"Yahoo scraping failed for {jan_code}: {e}")
+            return "N/A"
 
     def close(self):
-        if self.driver:
-            self.driver.quit()
-            self.driver = None
+        pass  # Handling is done by WebDriverManager
