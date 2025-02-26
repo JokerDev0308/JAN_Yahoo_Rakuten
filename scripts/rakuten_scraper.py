@@ -38,6 +38,8 @@ class RakutenScraper:
         try:
             price_element = self.driver.find_element(By.CSS_SELECTOR, ".price--3zUvK")
             price = price_element[0].text().strip()
+
+            print("Rakuten Price:", price)
         except Exception:
             price = "N/A"
 
