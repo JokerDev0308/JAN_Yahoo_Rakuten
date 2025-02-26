@@ -38,7 +38,9 @@ class RakutenScraper:
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price--3zUvK"))
             )
-            logger.info(f"item finding is succesful")
+            print("=============================")
+            logger.info("Item HTML: %s", items[0].get_attribute("outerHTML"))
+            print("=============================")
 
             price = items[0].text().strip()
             print("Rakuten Price:", price)
