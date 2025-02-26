@@ -34,12 +34,8 @@ class PriceScraper:
                     yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan, yh_url)
                     rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
-                    try:
-                        yahoo_product = yahoo_future.result()
-                    except Exception as e:
-                        print(f"Failed to scrape Yahoo product for JAN {jan}: {e}")
-                        yahoo_product = {"price": "N/A", "url": "N/A"}  # default to N/A
-
+                    yahoo_product = yahoo_future.result()
+                   
                     self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                     self.calculate_prices_for_row(index)

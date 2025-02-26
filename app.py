@@ -68,8 +68,9 @@ class PriceScraperUI:
             file.write('')
 
     def stop_running(self):
-        file_path = Path(config.OUTPUT_XLSX)
+        file_path = Path(config.RUNNING)
         file_path.unlink()
+        
 
     def display_main_content(self):
         
