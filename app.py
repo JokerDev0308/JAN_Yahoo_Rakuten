@@ -64,8 +64,10 @@ class PriceScraperUI:
        return os.path.exists(config.RUNNING) 
     
     def start_running(self):
+        if not self.running():
+            os.makedirs(os.path.dirname(config.RUNNING), exist_ok=True)
         with open(config.RUNNING, 'w') as file:
-            file.write('')
+            file.write('1')
 
     def stop_running(self):
         file_path = Path(config.RUNNING)
