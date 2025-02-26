@@ -42,6 +42,8 @@ class YahooScraper:
 
             prodcut_url = items[0].get_attribute('href')
 
+            print(prodcut_url)
+
             min_price = float('inf')
 
             try:
