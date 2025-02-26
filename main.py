@@ -44,7 +44,7 @@ class PriceScraper:
                 
                 self.calculate_prices_for_row(index)
                 
-                if (index + 1) % 10 == 0:  # Save more frequently
+                if (index + 1) % 10 == 0 or (index + 1) == total_records:  # Save more frequently
                     self.save_results()
 
                 sleep(1)  # Reduced sleep time
