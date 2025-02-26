@@ -25,7 +25,8 @@ class PriceScraper:
         try:
             total_records = len(self.df)
             for index, row in self.df.iterrows():
-                while WAITING:
+                while not RUNNING:
+                    print("Waiting")
                     sleep(1)
 
                 jan = row['JAN']
