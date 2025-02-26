@@ -12,8 +12,8 @@ class PriceScraper:
     def __init__(self):
         self.df = None
         # self.amazon_scraper = AmazonScraper()
-        self.yahoo_scraper = YahooScraper()
-        # self.rakuten_scraper = RakutenScraper()
+        # self.yahoo_scraper = YahooScraper()
+        self.rakuten_scraper = RakutenScraper()
 
     def load_data(self):
         self.df = pd.read_csv(JANCODE_SCV)
@@ -32,25 +32,25 @@ class PriceScraper:
             with ThreadPoolExecutor(max_workers=3) as executor:
                 try:
                     # amazon_future = executor.submit(self.amazon_scraper.scrape_price, jan)
-                    yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
-                    # rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+                    # yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
+                    rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
 
                     # Wait for results
                     # self.df.at[index, 'Amazon Price'] = amazon_future.result()
-                    self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
-                    # self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
+                    # self.df.at[index, 'Yahoo Price'] = yahoo_future.result()
+                    self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                 
                 except Exception as e:
                     print(f"Error scraping prices for JAN {jan}: {e}")
                     # self.df.at[index, 'Amazon Price'] = "Error"
-                    self.df.at[index, 'Yahoo Price'] = "Error"
-                    # self.df.at[index, 'Rakuten Price'] = "Error"
+                    # self.df.at[index, 'Yahoo Price'] = "Error"
+                    self.df.at[index, 'Rakuten Price'] = "Error"
             
             # Calculate prices for current record
             self.calculate_prices_for_row(index)
             
             # Save intermediate results
-            if (index + 1) % 50 == 0:
+            if (index + 1) % 8 == 0:
                 self.save_results()
 
             sleep(2)
@@ -58,8 +58,8 @@ class PriceScraper:
     def calculate_prices_for_row(self, index):
         prices = [
             # self.df.at[index, 'Amazon Price'],
-            self.df.at[index, 'Yahoo Price'],
-            # self.df.at[index, 'Rakuten Price']
+            # self.df.at[index, 'Yahoo Price'],
+            self.df.at[index, 'Rakuten Price']
         ]
 
         # Filter out "N/A" values and convert valid prices to numeric

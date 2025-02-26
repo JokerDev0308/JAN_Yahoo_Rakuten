@@ -32,12 +32,12 @@ class RakutenScraper:
         if not self.driver:
             self.setup_driver()
             
-        url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/"
+        url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?ran=1001000{jan_code}&s=11&used=0/"
         self.driver.get(url)
 
         try:
-            price_element = self.driver.find_element(By.CSS_SELECTOR, ".searchresultitem-price")
-            price = price_element.text.replace("円", "").replace(",", "").strip()
+            price_element = self.driver.find_element(By.CSS_SELECTOR, ".price--3zUvK")
+            price = price_element[0].text().strip()
         except Exception:
             price = "N/A"
 
