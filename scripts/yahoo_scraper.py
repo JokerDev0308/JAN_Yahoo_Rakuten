@@ -27,7 +27,7 @@ class YahooScraper:
 
             product_url = items[0].get_attribute('href')
             self.driver.get(product_url)
-            sleep(2)
+
             price_elements = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
