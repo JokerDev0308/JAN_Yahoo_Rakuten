@@ -1,13 +1,14 @@
 import logging
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import HEADLESS, TIMEOUT, CHROMEDRIVER_PATH
 
-# Configure logging
+
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -35,17 +36,19 @@ class YahooScraper:
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            # Find all items in one go
+            # Wait for the search results to load and find all items
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
 
-            print("href:===",items[0].get_attribute('href'))
+            # Get the link to the first item in the list
+            item_link = items[0].get_attribute('href')
+            logger.info(f"Found item link: {item_link}")
 
             try:
-                self.driver.get(items[0].get_attribute('href'))
+                self.driver.get(item_link)
                 
-                # Wait and find price elements
+                # Wait for the price element to be available
                 price_elements = WebDriverWait(self.driver, TIMEOUT).until(
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                 )
@@ -56,16 +59,16 @@ class YahooScraper:
                     price = "N/A"
                     
             except Exception as e:
-                logger.warning(f"Using fallback price due to: {e}")
+                logger.warning(f"Error retrieving price: {e}")
                 price = "N/A"
         
-
         except Exception as e:
-            logger.error(f"Scraping failed: {e}")
+            logger.error(f"Failed to scrape data for JAN code {jan_code}: {e}")
             price = "N/A"
 
         logger.info(f"Final Yahoo price for {jan_code}: {price}")
         return price
+
 
     def close(self):
         if self.driver:
