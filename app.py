@@ -82,7 +82,7 @@ class PriceScraperUI:
 
             col1, col2 = st.columns(2)
             with col1:
-                if st.butoon('Reload'):
+                if st.button('Reload'):
                     st.rerun()
             with col2:
                 self.download_excel()
