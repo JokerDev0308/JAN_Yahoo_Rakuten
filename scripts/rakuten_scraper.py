@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
-from .webdriver_manager import WebDriverManager
+from webdriver_manager import WebDriverManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

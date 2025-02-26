@@ -1,6 +1,6 @@
 import pandas as pd
 
-from scripts.webdriver_manager import WebDriverManager
+from webdriver_manager import WebDriverManager
 # from scripts.amazon_scraper import AmazonScraper
 from scripts.yahoo_scraper import YahooScraper
 from scripts.rakuten_scraper import RakutenScraper
