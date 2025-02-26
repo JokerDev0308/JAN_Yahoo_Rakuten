@@ -25,7 +25,9 @@ class PriceScraper:
                     return False
 
                 jan = row['JAN']
-                yh_url = row['YahooLink']
+
+                yh_url = row['YahooLink'] if row['YahooLink'] else None
+
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
 
                 with ThreadPoolExecutor(max_workers=2) as executor:
