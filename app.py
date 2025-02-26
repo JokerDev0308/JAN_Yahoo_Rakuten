@@ -29,7 +29,7 @@ class PriceScraperUI:
 
         else:
             try:
-                df = pd.read_excel(JANCODE_SCV)
+                df = pd.read_csv(JANCODE_SCV)
                 df.index = df.index + 1
                 height = min(len(df) * 35 + 38, 800)
                 st.dataframe(df, use_container_width=True, height=height, key = "jancode_original")
