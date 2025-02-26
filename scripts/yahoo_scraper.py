@@ -40,6 +40,8 @@ class YahooScraper:
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
 
+            print("href:===",items[0].get_attribute('href'))
+
             try:
                 self.driver.get(items[0].get_attribute('href'))
                 
