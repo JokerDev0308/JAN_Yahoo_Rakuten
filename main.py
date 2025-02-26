@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 
 from webdriver_manager import WebDriverManager
 # from scripts.amazon_scraper import AmazonScraper
@@ -39,10 +40,12 @@ class PriceScraper:
                     
                     self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
+                    self.calculate_prices_for_row(index)
 
-                    self.df.at[index, 'Yahoo! Link'] = yahoo_product["price"]
+                    self.df.at[index, 'Yahoo! Link'] = yahoo_product["url"]
+                    self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d')
                 
-                self.calculate_prices_for_row(index)
+                
                 
                 if (index + 1) % 10 == 0 or (index + 1) == total_records:  # Save more frequently
                     self.save_results()
@@ -67,14 +70,29 @@ class PriceScraper:
         else:
             min_price = "N/A"
             
-        self.df.at[index, 'Min Price'] = min_price
-        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - self.df.at[index, 'Min Price']
+        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - min_price
 
 
     def save_results(self):
+        column_name_mapping = {
+            'JAN': 'JAN（マスタ）',
+            'price': '価格（マスタ）',
+            'Yahoo Price': 'yahoo_実質価格',
+            'Rakuten Price': '楽天_実質価格',
+            'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
+            'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
+            'datetime': 'データ取得時間（Y!と楽の安い方）'
+        }
+
+        # Rename columns using the mapping
+        self.df.rename(columns=column_name_mapping, inplace=True)
+
+        # Create the directory if it doesn't exist and save the DataFrame to an Excel file
         os.makedirs(os.path.dirname(OUTPUT_XLSX), exist_ok=True)
         self.df.to_excel(OUTPUT_XLSX, index=False)
+        
         print(f"Progress saved to {OUTPUT_XLSX}")
+
 
 def main():
     try:
