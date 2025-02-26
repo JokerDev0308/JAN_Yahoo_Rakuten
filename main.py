@@ -25,7 +25,7 @@ class PriceScraper:
                     return False
 
                 jan = row['JAN']
-                yh_url = row['Yahoo Link']
+                yh_url = row['YahooLink']
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
 
                 with ThreadPoolExecutor(max_workers=2) as executor:
@@ -42,7 +42,7 @@ class PriceScraper:
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                     self.calculate_prices_for_row(index)
 
-                    self.df.at[index, 'Yahoo Link'] = yahoo_product["url"]
+                    self.df.at[index, 'YahooLink'] = yahoo_product["url"]
                     self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
                 if (index + 1) % 10 == 0 or (index + 1) == total_records:
@@ -78,7 +78,7 @@ class PriceScraper:
             'Yahoo Price': 'yahoo_実質価格',
             'Rakuten Price': '楽天_実質価格',
             'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-            'Yahoo Link': '対象リンク（Y!と楽の安い方）',
+            'YahooLink': '対象リンク（Y!と楽の安い方）',
             'datetime': 'データ取得時間（Y!と楽の安い方）'
         }
 
@@ -92,7 +92,7 @@ class PriceScraper:
         column_name_mapping = {
             'JAN': 'JAN',
             'price': '価格',
-            'Yahoo Link': 'Yahooリンク'
+            'YahooLink': 'Yahooリンク'
         }
 
         self.df.rename(columns=column_name_mapping, inplace=True)
