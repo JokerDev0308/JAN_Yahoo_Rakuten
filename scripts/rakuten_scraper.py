@@ -42,7 +42,7 @@ class RakutenScraper:
             logger.info("Item HTML: %s", items[0].get_attribute("outerHTML"))
             print("=============================")
 
-            price = items[0].text().strip()
+            price = items[0].text.translate(str.maketrans("", "", "円,"))
             print("Rakuten Price:", price)
         except Exception as e:
             logger.error(f"Scraping failed: {e}")
