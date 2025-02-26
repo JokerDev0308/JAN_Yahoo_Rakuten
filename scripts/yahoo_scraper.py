@@ -14,19 +14,24 @@ class YahooScraper:
     def __init__(self):
         self.driver = WebDriverManager.get_driver("yahoo")
 
-    def scrape_price(self, jan_code):
+    def scrape_price(self, jan_code, url = None):
         product = {}
+        product['url'] = url
+
         try:
-            self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
-            
-            items = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
-            )
 
-            if not items:
-                return "N/A"
+            if not url:
+                self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
+                
+                items = WebDriverWait(self.driver, TIMEOUT).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
+                )
 
-            product['url'] = items[0].get_attribute('href')
+                if not items:
+                    return "N/A"
+
+                product['url'] = items[0].get_attribute('href')
+
             self.driver.get(product['url'])
 
             price_elements = WebDriverWait(self.driver, TIMEOUT).until(
