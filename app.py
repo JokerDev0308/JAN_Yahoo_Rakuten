@@ -53,7 +53,7 @@ class PriceScraperUI:
     def _setup_scraping_controls(self):
         st.subheader("スクレイピング制御")
 
-        if self.running:
+        if self.running():
             st.sidebar.button("停 止", type="primary", use_container_width=True,
                             on_click=self.stop_running)
         else:
@@ -70,7 +70,7 @@ class PriceScraperUI:
     def stop_running(self):
         file_path = Path(config.RUNNING)
         file_path.unlink()
-        
+
 
     def display_main_content(self):
         
