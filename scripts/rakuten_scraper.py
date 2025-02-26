@@ -33,15 +33,11 @@ class RakutenScraper:
             self.setup_driver()
         try:
             self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?ran=1001000{jan_code}&s=11&used=0/")
-            logger.info(f"Page loading is succesful")
             # Find all items in one go
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price--3zUvK"))
             )
-            print("=============================")
-            logger.info("Item HTML: %s", items[0].get_attribute("outerHTML"))
-            print("=============================")
-
+            
             price = items[0].text.translate(str.maketrans("", "", "円,"))
             print("Rakuten Price:", price)
         except Exception as e:
