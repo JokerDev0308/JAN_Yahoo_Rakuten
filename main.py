@@ -27,10 +27,10 @@ class PriceScraper:
             for index, row in self.df.iterrows():
                 while not config.RUNNING:
                     print("Running was stopped")
-                    return
+                    return False
                 
-
-
+                print(config.RUNNING)
+                
                 jan = row['JAN']
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
                 

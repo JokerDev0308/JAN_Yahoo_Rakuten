@@ -17,14 +17,13 @@ class PriceScraperUI:
         with st.sidebar:
             self._setup_scraping_controls()
 
-            if st.button('Reload', use_container_width=True):
+            if st.button('リロード', use_container_width=True):
                 st.rerun()
             
             self.download_excel()
             
 
     def _handle_file_upload(self):
-        st.write("JANコードファイルをアップロード")
         uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
         if uploaded_file is not None:
             jan_df = pd.read_csv(uploaded_file)
