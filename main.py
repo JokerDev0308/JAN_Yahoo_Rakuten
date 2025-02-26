@@ -49,7 +49,7 @@ class PriceScraper:
 
                 if (index + 1) % 10 == 0 or (index + 1) == total_records:
                     self.save_results()
-                    self.save_yh_product_url_to_jancode()
+                    # self.save_yh_product_url_to_jancode()
 
                 sleep(1)  # Adjust sleep time
 
@@ -89,11 +89,11 @@ class PriceScraper:
 
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
-    def save_yh_product_url_to_jancode(self):
-        columns_to_keep = ['JAN', 'price', 'YahooLink']
-        self.df = self.df[columns_to_keep]
-        self.df.to_csv(config.JANCODE_SCV, index=False)
-        
+    # def save_yh_product_url_to_jancode(self):
+    #     columns_to_keep = ['JAN', 'price', 'YahooLink']
+    #     self.df = self.df[columns_to_keep]
+    #     self.df.to_csv(config.JANCODE_SCV, index=False)
+
 def main():
     try:
         while config.RUNNING:
