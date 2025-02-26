@@ -5,7 +5,7 @@ from webdriver_manager import WebDriverManager
 # from scripts.amazon_scraper import AmazonScraper
 from scripts.yahoo_scraper import YahooScraper
 from scripts.rakuten_scraper import RakutenScraper
-from config import JANCODE_SCV, OUTPUT_XLSX, RUNNING, WAITING
+import config 
 import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -19,15 +19,17 @@ class PriceScraper:
         self.rakuten_scraper = RakutenScraper()
 
     def load_data(self):
-        self.df = pd.read_csv(JANCODE_SCV)
+        self.df = pd.read_csv(config.JANCODE_SCV)
     
     def scrape_running(self):
         try:
             total_records = len(self.df)
             for index, row in self.df.iterrows():
-                while not RUNNING:
-                    print("Waiting")
-                    sleep(1)
+                while not config.RUNNING:
+                    print("Running was stopped")
+                    return
+                
+                
 
                 jan = row['JAN']
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
@@ -89,15 +91,15 @@ class PriceScraper:
         self.df.rename(columns=column_name_mapping, inplace=True)
 
         # Create the directory if it doesn't exist and save the DataFrame to an Excel file
-        os.makedirs(os.path.dirname(OUTPUT_XLSX), exist_ok=True)
-        self.df.to_excel(OUTPUT_XLSX, index=False)
+        os.makedirs(os.path.dirname(config.OUTPUT_XLSX), exist_ok=True)
+        self.df.to_excel(config.OUTPUT_XLSX, index=False)
         
-        print(f"Progress saved to {OUTPUT_XLSX}")
+        print(f"Progress saved to {config.OUTPUT_XLSX}")
 
 
 def main():
     try:
-        while RUNNING:
+        while config.RUNNING:
             scraper = PriceScraper()
             scraper.load_data()
             scraper.scrape_running()

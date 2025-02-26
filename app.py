@@ -2,9 +2,16 @@ import streamlit as st
 import pandas as pd
 import config
 
+st.set_page_config(
+    page_title="JANコード価格スクレーパーモニター",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 class PriceScraperUI:
     def __init__(self):
-        self.title = "📊 JANコード価格スクレーパーモニター"
+        self.initialized = False
         
     def setup_sidebar(self):
         with st.sidebar:
