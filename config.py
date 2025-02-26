@@ -1,6 +1,6 @@
 # config.py
 HEADLESS = True  # Set to False if you want to see browser running
-TIMEOUT = 10  # Selenium wait timeout
+TIMEOUT = 2  # Selenium wait timeout
 CHROMEDRIVER_PATH = "drivers/chromedriver-linux64/chromedriver"
 JANCODE_SCV = 'data/jan_codes.csv'
 JANCODE_YH_AFFILI_SCV = 'data/jan_YH_afiil_codes.csv'
