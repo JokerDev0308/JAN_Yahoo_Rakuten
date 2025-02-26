@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from .webdriver_manager import WebDriverManager
+from time import sleep
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +27,7 @@ class YahooScraper:
 
             product_url = items[0].get_attribute('href')
             self.driver.get(product_url)
-            
+            sleep(2)
             price_elements = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
