@@ -11,6 +11,16 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+column_name_mapping = {
+        'JAN': 'JAN（マスタ）',
+        'price': '価格（マスタ）',
+        'Yahoo Price': 'yahoo_実質価格',
+        'Rakuten Price': '楽天_実質価格',
+        'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
+        'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
+        'datetime': 'データ取得時間（Y!と楽の安い方）'
+    }
+
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
@@ -75,31 +85,45 @@ class PriceScraperUI:
 
 
     def display_main_content(self):
-        
         try:
+            # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
+            df.rename(columns=column_name_mapping, inplace=True)
+
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
-            st.dataframe(df, use_container_width=True, height=height, key = "result")
-            
+            st.dataframe(df, use_container_width=True, height=height, key="result")
+
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
+
 
     def download_excel(self):
         try:
-            # Provide an option to download the existing Excel file directly
-            with open(config.OUTPUT_XLSX, "rb") as file:
+            # Load the DataFrame from the Excel file
+            df = pd.read_excel(config.OUTPUT_XLSX)
+            df.rename(columns=column_name_mapping, inplace=True)
+
+            temp_file_path = "/tmp/scraped_data_updated.xlsx"
+            df.to_excel(temp_file_path, index=False)
+
+            # Provide an option to download the updated Excel file
+            with open(temp_file_path, "rb") as file:
                 st.download_button(
                     label="ダウンロード",
                     data=file,
-                    file_name="scraped_data.xlsx",
+                    file_name="scraped_data_updated.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True
                 )
-                
+
+            # Optionally, remove the temporary file after download
+            os.remove(temp_file_path)
+
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
+            
     def run(self):
         self.setup_sidebar()
 

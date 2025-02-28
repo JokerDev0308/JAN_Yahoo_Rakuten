@@ -45,7 +45,6 @@ class PriceScraper:
                     )
 
                     yahoo_product = yahoo_future.result()
-                    print(f"Yahoo Product: {yahoo_product}")  # Debugging print statement
 
                     # Check if yahoo_product is a dictionary
                     if isinstance(yahoo_product, dict) and "price" in yahoo_product:
@@ -94,23 +93,8 @@ class PriceScraper:
 
 
     def save_results(self):
-        # column_name_mapping = {
-        #     'JAN': 'JAN（マスタ）',
-        #     'price': '価格（マスタ）',
-        #     'Yahoo Price': 'yahoo_実質価格',
-        #     'Rakuten Price': '楽天_実質価格',
-        #     'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-        #     'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
-        #     'datetime': 'データ取得時間（Y!と楽の安い方）'
-        # }
-
-        # # Rename columns using the mapping
-        # self.df.rename(columns=column_name_mapping, inplace=True)
-
-        # Create the directory if it doesn't exist and save the DataFrame to an Excel file
         os.makedirs(os.path.dirname(config.OUTPUT_XLSX), exist_ok=True)
-        self.df.to_excel(config.OUTPUT_XLSX, index=False)
-        
+        self.df.to_excel(config.OUTPUT_XLSX, index=False)        
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
     def save_yahoo_urls(self):
