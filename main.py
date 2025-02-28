@@ -47,10 +47,11 @@ class PriceScraper:
                     yahoo_product = yahoo_future.result()
 
                     # Check if yahoo_product is a dictionary
-                    if isinstance(yahoo_product, dict) and "price" in yahoo_product:
+                    if yahoo_product == "N/A":
                         yahoo_price = yahoo_product["price"]
-                        self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
-                        self.df.at[index, 'Yahoo! Link'] = yahoo_product.get("url", "N/A")
+                        yahoo_url = yahoo_product.get("url", "N/A")
+                        self.df.at[index, 'Yahoo Price'] = yahoo_price
+                        self.df.at[index, 'Yahoo! Link'] = yahoo_url
                     else:
                         # If yahoo_product is not a dictionary, handle it as an error
                         self.df.at[index, 'Yahoo Price'] = "N/A"
@@ -64,12 +65,12 @@ class PriceScraper:
                     if yahoo_price != "N/A" and rakuten_price != "N/A":
                         min_price = min(float(yahoo_price), float(rakuten_price))
                         if min_price == float(yahoo_price):
-                            self.df.at[index, 'Min Price URL'] = yahoo_product.get("url", "N/A")
+                            self.df.at[index, 'Min Price URL'] = yahoo_url
                         else:
                             # Assuming Rakuten doesn't have a URL for each product, use a placeholder or provide Rakuten URL if available
                             self.df.at[index, 'Min Price URL'] = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/" 
                     elif yahoo_price != "N/A":  
-                        self.df.at[index, 'Min Price URL'] = yahoo_product.get("url", "N/A")
+                        self.df.at[index, 'Min Price URL'] = yahoo_url
                     elif rakuten_price != "N/A":  
                         self.df.at[index, 'Min Price URL'] = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/"
                     else:
