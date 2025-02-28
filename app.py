@@ -31,6 +31,31 @@ ordered_columns = [
             'データ取得時間（Y!と楽の安い方）'
         ]
 
+st.markdown("""
+    <style>
+    .modal {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 20px;
+        z-index: 9999;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .modal-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
@@ -48,19 +73,24 @@ class PriceScraperUI:
             self.download_excel()
 
     def show_login_modal(self):
-        # Create a form in the modal
-        with st.form(key="login_form"):
-            st.write("### Login")
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            login_button = st.form_submit_button("Login")
-            
-            if login_button:
-                if username == "admin" and password == "password":  # Example authentication
-                    st.session_state.logged_in = True
-                    st.success("Login successful!")
-                else:
-                    st.error("Invalid username or password!")
+        st.markdown('<div class="modal">', unsafe_allow_html=True)
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        login_button = st.button("Login")
+
+        if login_button:
+            if username == "admin" and password == "password":
+                st.session_state.logged_in = True
+                st.success("Login successful!")
+            else:
+                st.error("Invalid username or password!")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Optional: Close button or action
+        if st.button("Close Modal"):
+            st.session_state.logged_in = False
+            st.experimental_rerun()
 
     def logout(self):
         st.session_state.logged_in = False
