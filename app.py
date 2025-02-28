@@ -79,57 +79,22 @@ class PriceScraperUI:
             if st.button("ログアウト", use_container_width=True):
                 st.session_state.authenticated = False
                 st.rerun()
-    
+    @st.dialog("login", width="small")
     def show_login_modal(self):
         # Use an empty container to simulate a modal dialog
         with st.container():
-            # Modal overlay effect (simulated)
-            st.markdown(
-                """
-                <style>
-                .modal-background {
-                    background-color: rgba(0, 0, 0, 0.5);
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 1000;
-                }
-                .modal-content {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-                    z-index: 1001;
-                    width: 300px;
-                }
-                </style>
-                """, unsafe_allow_html=True)
+            # Collecting user input
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            
+            login_button = st.button("Login")
+            if login_button:
+                if authenticate(username, password):
+                    st.session_state.logged_in = True
+                    st.success("Login successful!")
+                else:
+                    st.error("Invalid username or password.")
 
-            # Modal background and content
-            # st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
-            with st.container():
-                st.markdown('<div class="modal-content">', unsafe_allow_html=True)
-                st.subheader("Login to Your Account")
-
-                # Collecting user input
-                username = st.text_input("Username")
-                password = st.text_input("Password", type="password")
-                
-                login_button = st.button("Login")
-                if login_button:
-                    if authenticate(username, password):
-                        st.session_state.logged_in = True
-                        st.success("Login successful!")
-                    else:
-                        st.error("Invalid username or password.")
-
-                st.markdown('</div>', unsafe_allow_html=True)
 
     def _handle_file_upload(self):
         uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
