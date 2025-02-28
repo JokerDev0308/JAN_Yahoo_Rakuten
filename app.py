@@ -199,8 +199,9 @@ class PriceScraperUI:
             
     def run(self):
         if not st.session_state.logged_in:
-            st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="modal-background">', unsafe_allow_html=True)
             self.show_login_modal()
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.sidebar.button("Logout", on_click=self.logout)
             self.setup_sidebar()
