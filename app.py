@@ -13,20 +13,13 @@ session_manager = SessionManager()
 def authenticate(username: str, password: str) -> bool:
     if session_manager.validate_user(username, password):
         config.CURRENT_USER = username
-        session = get_cookie("ajs_anonymous_id")
+        session = get_session_id()
         config.LOGIN_STATE[session] = True
         return True
     return False
 
-def get_cookie():
-    # Custom JS to retrieve the cookie value
-    cookie_value = components.html("""
-        <script>
-        var value = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)ajs_anonymous_id\\s*=\\s*([^;]*).*$)|^.*$"), "$1");
-        window.parent.postMessage(value, "*");
-        </script>
-    """, height=0, width=0)
-    st.write(cookie_value)
+def get_session_id():
+    cookie_value = 1
     return cookie_value
 
 # Set Streamlit page configuration
@@ -197,23 +190,22 @@ class PriceScraperUI:
 
     
     def logout(self):
-        session = get_cookie("ajs_anonymous_id")
+        session = get_session_id()
         config.LOGIN_STATE[session] = False
         config.CURRENT_USER = None
         st.rerun()
 
     def run(self):
-        session1 = get_cookie()
-        st.write(f"Session Cookie Value: {session1}")
-        # if config.LOGIN_STATE[session]:
-        #     self.setup_sidebar()
-        #     tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
-        #     with tab1:
-        #         self.display_main_content()
-        #     with tab2:
-        #         self._handle_file_upload()
-        # else:
-        #     self.show_login_modal()
+        session = get_session_id()
+        if config.LOGIN_STATE[session]:
+            self.setup_sidebar()
+            tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
+            with tab1:
+                self.display_main_content()
+            with tab2:
+                self._handle_file_upload()
+        else:
+            self.show_login_modal()
 
 # Initialize and run the app
 app = PriceScraperUI()
