@@ -80,7 +80,7 @@ class PriceScraperUI:
                 st.session_state.authenticated = False
                 st.rerun()
     
-    def show_login_modal():
+    def show_login_modal(self):
         # Use an empty container to simulate a modal dialog
         with st.container():
             # Modal overlay effect (simulated)
