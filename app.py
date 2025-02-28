@@ -31,38 +31,6 @@ ordered_columns = [
             'データ取得時間（Y!と楽の安い方）'
         ]
 
-st.markdown("""
-    <style>
-    .modal-background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 9998;
-    }
-    .modal {
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: white;
-        border-radius: 10px;
-        padding: 20px;
-        width: 90%;
-        max-width: 400px;  /* Set a maximum width for the modal */
-        z-index: 9999;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-    @media (max-width: 600px) {
-        .modal {
-            width: 80%;  /* Adjust modal width on smaller screens */
-        }
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 class PriceScraperUI:
     def __init__(self):
@@ -199,9 +167,7 @@ class PriceScraperUI:
             
     def run(self):
         if not st.session_state.logged_in:
-            st.markdown('<div class="modal-background">', unsafe_allow_html=True)
             self.show_login_modal()
-            st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.sidebar.button("Logout", on_click=self.logout)
             self.setup_sidebar()
