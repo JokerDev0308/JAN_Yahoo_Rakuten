@@ -18,11 +18,11 @@ def authenticate(username: str, password: str) -> bool:
         return True
     return False
 
-def get_cookie(name):
-    cookie_value = components.html(f"""
+def get_cookie():
+    # Custom JS to retrieve the cookie value
+    cookie_value = components.html("""
         <script>
-        var name = "{name}";
-        var value = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)" + name + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1");
+        var value = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)ajs_anonymous_id\\s*=\\s*([^;]*).*$)|^.*$"), "$1");
         window.parent.postMessage(value, "*");
         </script>
     """, height=0, width=0)
@@ -202,8 +202,8 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
-        session1 = get_cookie("ajs_anonymous_id")
-        st.write(session1)
+        session1 = get_cookie()
+        st.write(f"Session Cookie Value: {session1}")
         # if config.LOGIN_STATE[session]:
         #     self.setup_sidebar()
         #     tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
