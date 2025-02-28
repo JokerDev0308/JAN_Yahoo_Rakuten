@@ -8,6 +8,8 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from typing import Optional, Dict, Any
+import numpy as np
+
 
 class PriceScraper:
     def __init__(self):
@@ -19,7 +21,8 @@ class PriceScraper:
     def load_data(self) -> None:
         """Load JAN codes and prices from CSV file"""
         self.df = pd.read_csv(config.JANCODE_SCV)
-    
+
+
     def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
         """Process a single product and return results"""
         jan = row['JAN']
@@ -32,19 +35,27 @@ class PriceScraper:
             yahoo_product = yahoo_future.result()
             rakuten_price = rakuten_future.result()
 
-        yahoo_price = yahoo_product.get("price", "N/A") if yahoo_product != "N/A" else "N/A"
-        yahoo_url = yahoo_product.get("url", "N/A") if yahoo_product != "N/A" else "N/A"
+        # Handle Yahoo product price and URL, default to np.nan if not available
+        if yahoo_product != "N/A":
+            yahoo_price = yahoo_product.get("price", np.nan)
+            yahoo_url = yahoo_product.get("url", "N/A")
+        else:
+            yahoo_price = np.nan
+            yahoo_url = "N/A"
+
+        # Rakuten URL generation
         rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0"
 
-        # Determine minimum price URL
+        # Initialize default values
         min_price_url = "N/A"
-        price_diff = "N/A"
-        
-        if yahoo_price != "N/A" and rakuten_price != "N/A":
+        price_diff = np.nan
+
+        # Determine minimum price and price difference
+        if yahoo_price != np.nan and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
             min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
             price_diff = float(row['price']) - min_price
-        elif yahoo_price != "N/A":
+        elif yahoo_price != np.nan:
             min_price_url = yahoo_url
         elif rakuten_price != "N/A":
             min_price_url = rakuten_url
@@ -57,6 +68,7 @@ class PriceScraper:
             'Price Difference': price_diff,
             'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
+
 
     def scrape_running(self) -> None:
         """Main scraping loop with optimized batch processing"""
