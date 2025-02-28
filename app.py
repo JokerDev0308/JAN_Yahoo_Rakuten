@@ -64,8 +64,7 @@ class PriceScraperUI:
 
             # Logout button
             if st.button("ログアウト", use_container_width=True):
-                st.session_state.authenticated = False
-                st.rerun()
+                self.logout()
 
 
     def show_login_modal(self):
