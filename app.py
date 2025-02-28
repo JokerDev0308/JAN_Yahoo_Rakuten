@@ -92,11 +92,15 @@ class PriceScraperUI:
                 }
                 
                 @media (max-width: 1440px) {
-                    padding: 3rem !important;
+                    .st-emotion-cache-qcpnpn {
+                        padding: 3rem !important;
+                    }
                 }
 
                 @media (max-width: 1280px) {
-                    padding: 1rem !important;
+                    .st-emotion-cache-qcpnpn {
+                        padding: 1rem !important;
+                    }
                 }
                 </style>
                 """, unsafe_allow_html=True)
