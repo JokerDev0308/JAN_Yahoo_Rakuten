@@ -39,7 +39,7 @@ class YahooScraper:
             )
             
             if price_elements:
-                product["price"] = price_elements[0].text.translate(str.maketrans("", "", "円,"))
+                product["price"] = price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
                 return product
             
             return "N/A"
