@@ -18,7 +18,7 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_session_id():
-    cookie_value = 1
+    cookie_value = "Admin"
     return cookie_value
 
 # Set Streamlit page configuration
@@ -196,7 +196,7 @@ class PriceScraperUI:
 
     def run(self):
         session = get_session_id()
-        if config.LOGIN_STATE[session]:
+        if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
             self.setup_sidebar()
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
