@@ -34,7 +34,7 @@ class PriceScraper:
 
         yahoo_price = yahoo_product.get("price", "N/A") if yahoo_product != "N/A" else "N/A"
         yahoo_url = yahoo_product.get("url", "N/A") if yahoo_product != "N/A" else "N/A"
-        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/"
+        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0"
 
         # Determine minimum price URL
         min_price_url = "N/A"
