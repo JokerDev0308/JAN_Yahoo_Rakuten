@@ -104,9 +104,22 @@ class PriceScraper:
 
     def save_yahoo_urls(self):
         """Save JANs and their corresponding Yahoo URLs"""
+        # Print column names for debugging
+        print(self.df.columns)
+
+        required_columns = ['JAN', 'price', 'Yahoo! Link']
+        
+        # Check if all required columns are present
+        missing_columns = [col for col in required_columns if col not in self.df.columns]
+        if missing_columns:
+            print(f"Missing columns: {missing_columns}")
+            return  # Handle missing columns as necessary
+        
+        # Select the desired columns
         urls_df = self.df[['JAN', 'price', 'Yahoo! Link']].copy()
         urls_df.to_csv(config.JANCODE_SCV, index=False)
         print(f"URLs saved to {config.JANCODE_SCV}")
+
 
     def running(self):
        return os.path.exists(config.RUNNING)
