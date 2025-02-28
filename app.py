@@ -112,7 +112,7 @@ class PriceScraperUI:
                 """, unsafe_allow_html=True)
 
             # Modal background and content
-            st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
+            # st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
             with st.container():
                 st.markdown('<div class="modal-content">', unsafe_allow_html=True)
                 st.subheader("Login to Your Account")
