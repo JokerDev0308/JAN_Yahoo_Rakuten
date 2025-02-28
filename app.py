@@ -86,6 +86,20 @@ class PriceScraperUI:
         with col2:
                         
             with st.container(border=True):
+
+                st.markdown(
+                    """
+                    <style>
+                        #login{
+                            text-align:center;
+                        }
+
+                        .stButton{
+                            text-align:center;
+                        }
+                    </style>
+                    """
+                )
                 
                 st.subheader("Login")
 
