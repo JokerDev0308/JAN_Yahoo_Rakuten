@@ -1,128 +1,121 @@
 import pandas as pd
 from datetime import datetime
-
 from webdriver_manager import WebDriverManager
-# from scripts.amazon_scraper import AmazonScraper
 from scripts.yahoo_scraper import YahooScraper
 from scripts.rakuten_scraper import RakutenScraper
 import config 
 import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
-
+from typing import Optional, Dict, Any
 
 class PriceScraper:
     def __init__(self):
-        self.df = None
-        # self.amazon_scraper = AmazonScraper()
+        self.df: Optional[pd.DataFrame] = None
         self.yahoo_scraper = YahooScraper()
         self.rakuten_scraper = RakutenScraper()
+        self.batch_size = 10  # Configurable batch size for saving
 
-    def load_data(self):
+    def load_data(self) -> None:
+        """Load JAN codes and prices from CSV file"""
         self.df = pd.read_csv(config.JANCODE_SCV)
     
-    def scrape_running(self):
+    def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
+        """Process a single product and return results"""
+        jan = row['JAN']
+        saved_url = row.get('Yahoo! Link')
+        
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan, saved_url)
+            rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+            
+            yahoo_product = yahoo_future.result()
+            rakuten_price = rakuten_future.result()
+
+        yahoo_price = yahoo_product.get("price", "N/A") if yahoo_product != "N/A" else "N/A"
+        yahoo_url = yahoo_product.get("url", "N/A") if yahoo_product != "N/A" else "N/A"
+        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/"
+
+        # Determine minimum price URL
+        min_price_url = "N/A"
+        price_diff = "N/A"
+        
+        if yahoo_price != "N/A" and rakuten_price != "N/A":
+            min_price = min(float(yahoo_price), float(rakuten_price))
+            min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
+            price_diff = float(row['price']) - min_price
+        elif yahoo_price != "N/A":
+            min_price_url = yahoo_url
+        elif rakuten_price != "N/A":
+            min_price_url = rakuten_url
+
+        return {
+            'Yahoo Price': yahoo_price,
+            'Yahoo! Link': yahoo_url,
+            'Rakuten Price': rakuten_price,
+            'Min Price URL': min_price_url,
+            'Price Difference': price_diff,
+            'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+    def scrape_running(self) -> None:
+        """Main scraping loop with optimized batch processing"""
+        if self.df is None or self.df.empty:
+            return
+
         try:
             total_records = len(self.df)
             for index, row in self.df.iterrows():
-                while not self.running():
+                if not self.running():
                     print("Running was stopped")
                     return
-    
-                jan = row['JAN']
-                saved_url = row.get('Yahoo URL')
-                print(f"Processing {index + 1}/{total_records}: JAN {jan}")
+
+                print(f"Processing {index + 1}/{total_records}: JAN {row['JAN']}")
                 
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    yahoo_future = executor.submit(
-                        self.yahoo_scraper.scrape_price, 
-                        jan,
-                        saved_url
-                    )
-                    rakuten_future = executor.submit(
-                        self.rakuten_scraper.scrape_price, 
-                        jan
-                    )
-    
-                    yahoo_product = yahoo_future.result()
-                    
-                    self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
-                    self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
-                    self.calculate_prices_for_row(index)
-    
-                    # Save the URL for future use
-                    self.df.at[index, 'Yahoo! Link'] = yahoo_product["url"]
-                    self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                # Process single product
+                results = self.process_product(index, row)
                 
-                if (index + 1) % 10 == 0 or (index + 1) == total_records:
+                # Update DataFrame
+                for key, value in results.items():
+                    self.df.at[index, key] = value
+
+                # Save results in batches
+                if (index + 1) % self.batch_size == 0 or (index + 1) == total_records:
                     self.save_results()
-                    self.save_yahoo_urls()  
-    
-                sleep(1)
+                    self.save_yahoo_urls()
+
+                sleep(1)  # Rate limiting
+                
         finally:
             WebDriverManager.close_all()
 
-            
-    def calculate_prices_for_row(self, index):
-        prices = [
-            # self.df.at[index, 'Amazon Price'],
-            self.df.at[index, 'Yahoo Price'],
-            self.df.at[index, 'Rakuten Price']
-        ]
-
-        # Filter out "N/A" values and convert valid prices to numeric
-        valid_prices = [float(price) for price in prices if price != "N/A" and price is not None]
-
-        # If there are valid prices, calculate the minimum; otherwise, handle the "no valid prices" case
-        if valid_prices:
-            min_price = min(valid_prices)
-        else:
-            min_price = "N/A"
-            
-        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - min_price
-
-
-    def save_results(self):
-        # column_name_mapping = {
-        #     'JAN': 'JAN（マスタ）',
-        #     'price': '価格（マスタ）',
-        #     'Yahoo Price': 'yahoo_実質価格',
-        #     'Rakuten Price': '楽天_実質価格',
-        #     'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-        #     'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
-        #     'datetime': 'データ取得時間（Y!と楽の安い方）'
-        # }
-
-        # # Rename columns using the mapping
-        # self.df.rename(columns=column_name_mapping, inplace=True)
-
-        # Create the directory if it doesn't exist and save the DataFrame to an Excel file
+    def save_results(self) -> None:
+        """Save results to Excel file"""
         os.makedirs(os.path.dirname(config.OUTPUT_XLSX), exist_ok=True)
         self.df.to_excel(config.OUTPUT_XLSX, index=False)
-        
         print(f"Progress saved to {config.OUTPUT_XLSX}")
 
-    def save_yahoo_urls(self):
+    def save_yahoo_urls(self) -> None:
         """Save JANs and their corresponding Yahoo URLs"""
         urls_df = self.df[['JAN', 'price', 'Yahoo! Link']].copy()
         urls_df.to_csv(config.JANCODE_SCV, index=False)
         print(f"URLs saved to {config.JANCODE_SCV}")
 
-    def running(self):
-       return os.path.exists(config.RUNNING)
+    @staticmethod
+    def running() -> bool:
+        """Check if scraping should continue"""
+        return os.path.exists(config.RUNNING)
 
 def main():
     try:
-        i = 0
+        iteration = 0
         while True:
-            first = datetime.now()
+            print(f"Iteration {iteration} started at {datetime.now()}")
             scraper = PriceScraper()
             scraper.load_data()
-            print(f"loading =={i}==", datetime.now() - first)
             scraper.scrape_running()
-            print(f"scraping =={i}==", datetime.now() - first)
             sleep(5)
-            i += 1
+            iteration += 1
     except KeyboardInterrupt:
         WebDriverManager.close_all()
 
