@@ -104,7 +104,7 @@ class PriceScraper:
 
     def save_yahoo_urls(self):
         """Save JANs and their corresponding Yahoo URLs"""
-        urls_df = self.df[['JAN', 'price', 'Yahoo! Link']].copy()
+        urls_df = self.df['JAN', 'price', 'Yahoo! Link'].copy()
         urls_df.to_csv(config.JANCODE_SCV, index=False)
         print(f"URLs saved to {config.JANCODE_SCV}")
 
