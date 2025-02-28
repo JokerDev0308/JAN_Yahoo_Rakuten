@@ -62,8 +62,8 @@ class PriceScraper:
             min_price_url = rakuten_url
             min_price = rakuten_price
 
-
-        if min_price != np.nan:
+        # Ensure 'row['price']' is a valid number before subtraction
+        if isinstance(row['price'], (int, float)):
             price_diff = float(row['price']) - min_price
 
         return {
@@ -74,6 +74,7 @@ class PriceScraper:
             'Price Difference': price_diff,
             'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
+
 
 
     def scrape_running(self) -> None:
