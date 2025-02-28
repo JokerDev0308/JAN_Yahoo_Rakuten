@@ -47,16 +47,16 @@ class PriceScraperUI:
             
             self.download_excel()
 
-    def show_login_modal(self):
-        # Create a container for the modal content
-        with st.expander("Login", expanded=False):
+    def show_login_modal():
+        # Create a form in the modal
+        with st.form(key="login_form"):
             st.write("### Login")
-            username = st.text_input("Username", key="username")
-            password = st.text_input("Password", type="password", key="password")
-            login_button = st.button("Login")
-
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            login_button = st.form_submit_button("Login")
+            
             if login_button:
-                if username == "admin" and password == "password":  # Replace with real authentication logic
+                if username == "admin" and password == "password":  # Example authentication
                     st.session_state.logged_in = True
                     st.success("Login successful!")
                 else:
@@ -166,10 +166,8 @@ class PriceScraperUI:
             
     def run(self):
         if not st.session_state.logged_in:
-            st.write("### Please log in to access the app:")
             self.show_login_modal()
         else:
-            st.write("### Welcome to the App!")
             st.sidebar.button("Logout", on_click=self.logout)
             self.setup_sidebar()
 
