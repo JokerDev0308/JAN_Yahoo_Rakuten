@@ -90,6 +90,12 @@ class PriceScraperUI:
             df = pd.read_excel(config.OUTPUT_XLSX)
             df.rename(columns=column_name_mapping, inplace=True)
 
+            # Drop the "Yahoo! Link" column
+            if "Yahoo! Link" in df.columns:
+                df.drop(columns=["Yahoo! Link"], inplace=True)
+
+            df = df[column_name_mapping]
+
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
             st.dataframe(df, use_container_width=True, height=height, key="result")
@@ -103,6 +109,12 @@ class PriceScraperUI:
             # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
             df.rename(columns=column_name_mapping, inplace=True)
+
+            # Drop the "Yahoo! Link" column
+            if "Yahoo! Link" in df.columns:
+                df.drop(columns=["Yahoo! Link"], inplace=True)
+            
+            df = df[column_name_mapping]
 
             temp_file_path = "/tmp/scraped_data_updated.xlsx"
             df.to_excel(temp_file_path, index=False)
