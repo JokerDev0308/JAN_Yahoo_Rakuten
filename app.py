@@ -98,11 +98,12 @@ class PriceScraperUI:
         try:
             # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            df.rename(columns=column_name_mapping, inplace=True)[ordered_columns]
-
+            
             # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
+
+            df = df.rename(columns=column_name_mapping)[ordered_columns]
 
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
@@ -116,11 +117,11 @@ class PriceScraperUI:
         try:
             # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            df.rename(columns=column_name_mapping, inplace=True)[ordered_columns]
-
             # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
+
+            df = df.rename(columns=column_name_mapping)[ordered_columns]
 
             temp_file_path = "/tmp/scraped_data_updated.xlsx"
             df.to_excel(temp_file_path, index=False)
