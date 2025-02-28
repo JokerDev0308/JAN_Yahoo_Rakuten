@@ -8,3 +8,5 @@ OUTPUT_XLSX = 'data/scraped_prices.xlsx'
 
 RUNNING = "tmp/running"
 WAITING = False
+CURRENT_USER = None
+LOGIN_STATE = False

@@ -4,29 +4,16 @@ import config
 import os
 from pathlib import Path
 from session_manager import SessionManager
+import config
 
 session_manager = SessionManager()
 
 def authenticate(username: str, password: str) -> bool:
     if session_manager.validate_user(username, password):
-        session_id = session_manager.create_session(username)
-        st.session_state.session_id = session_id
-        st.session_state.authenticated = True
-        st.session_state.username = username
+        config.CURRENT_USER = username
+        config.LOGIN_STATE = True
         return True
     return False
-
-# Add session validation at app startup
-if "session_id" in st.session_state:
-    session = session_manager.get_session(st.session_state.session_id)
-    if session:
-        st.session_state.authenticated = True
-        st.session_state.username = session["username"]
-    else:
-        st.session_state.authenticated = False
-else:
-    st.session_state.authenticated = False
-
 
 
 
@@ -96,6 +83,10 @@ class PriceScraperUI:
 
                         .stButton{
                             text-align:center;
+                        }
+
+                        .stButton>button{
+                            min-width:7rem;
                         }
                     </style>
                     """
@@ -195,13 +186,12 @@ class PriceScraperUI:
 
     
     def logout(self):
-        if "session_id" in st.session_state:
-            del st.session_state.session_id
-        st.session_state.authenticated = False
+        config.LOGIN_STATE = False
+        config.CURRENT_USER = None
         st.rerun()
 
     def run(self):
-        if st.session_state.authenticated:
+        if config.LOGIN_STATE:
             self.setup_sidebar()
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
