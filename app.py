@@ -4,6 +4,7 @@ import config
 import os
 from pathlib import Path
 
+# Set Streamlit page configuration
 st.set_page_config(
     page_title="JANコード価格スクレーパーモニター",
     page_icon="📊",
@@ -11,139 +12,101 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Column name mappings
 column_name_mapping = {
-        'JAN': 'JAN（マスタ）',
-        'price': '価格（マスタ）',
-        'Yahoo Price': 'yahoo_実質価格',
-        'Rakuten Price': '楽天_実質価格',
-        'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-        'Min Price URL': '対象リンク（Y!と楽の安い方）',
-        'datetime': 'データ取得時間（Y!と楽の安い方）'
-    }
+    'JAN': 'JAN（マスタ）',
+    'price': '価格（マスタ）',
+    'Yahoo Price': 'yahoo_実質価格',
+    'Rakuten Price': '楽天_実質価格',
+    'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
+    'Min Price URL': '対象リンク（Y!と楽の安い方）',
+    'datetime': 'データ取得時間（Y!と楽の安い方）'
+}
 
 ordered_columns = [
-            'JAN（マスタ）',
-            '価格（マスタ）',
-            'yahoo_実質価格',
-            '楽天_実質価格',
-            '価格差（マスタ価格‐Y!と楽の安い方）',
-            '対象リンク（Y!と楽の安い方）',
-            'データ取得時間（Y!と楽の安い方）'
-        ]
+    'JAN（マスタ）',
+    '価格（マスタ）',
+    'yahoo_実質価格',
+    '楽天_実質価格',
+    '価格差（マスタ価格‐Y!と楽の安い方）',
+    '対象リンク（Y!と楽の安い方）',
+    'データ取得時間（Y!と楽の安い方）'
+]
 
+# Initialize authentication state
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
 
+# Authentication function
+def authenticate(username, password):
+    valid_users = {"admin": "password123", "user": "test123"}
+    if username in valid_users and valid_users[username] == password:
+        st.session_state.authenticated = True
+        st.rerun()
+    else:
+        st.error("Invalid username or password")
+
+# Show login modal if the user is not authenticated
+if not st.session_state.authenticated:
+    with st.modal("Login", closable=False):
+        st.write("### ログインが必要です")
+        username = st.text_input("ユーザー名", key="username")
+        password = st.text_input("パスワード", type="password", key="password")
+        if st.button("ログイン"):
+            authenticate(username, password)
+    st.stop()  # Prevents unauthorized users from accessing the app
+
+# Main application class
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
         self.Running = False
-        if "logged_in" not in st.session_state:
-            st.session_state.logged_in = False
-        
+
     def setup_sidebar(self):
         with st.sidebar:
+            st.subheader("メニュー")
             self._setup_scraping_controls()
 
             if st.button('リロード', use_container_width=True):
                 st.rerun()
-            
+
             self.download_excel()
 
-
-    def show_login_modal(self):
-        st.markdown(
-                """
-                <style>
-                .modal-background {
-                    background-color: rgba(0, 0, 0, 0.5);
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 1000;
-                }
-                .modal-content {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-                    z-index: 1001;
-                    width: 300px;
-                    text-align: center;
-                }
-                </style>
-                <div class="modal-background"></div>
-                <div class="modal-content">
-                """,
-                unsafe_allow_html=True,
-            )
-
-        st.subheader("Login to Your Account")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-
-        if st.button("Login"):
-            if self.check_credentials(username, password):
-                st.session_state.logged_in = True
-                st.experimental_rerun()  # Refresh to hide modal
-            else:
-                st.error("Invalid username or password.")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        
-
-    # Function to check login credentials
-    def check_credentials(self, username, password):
-        # Dummy credentials for demonstration
-        return username == "admin" and password == "password123"
-
-    def logout(self):
-        st.session_state.logged_in = False
-        st.experimental_rerun()
-            
+            # Logout button
+            if st.button("ログアウト", use_container_width=True):
+                st.session_state.authenticated = False
+                st.rerun()
 
     def _handle_file_upload(self):
         uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
         if uploaded_file is not None:
             jan_df = pd.read_csv(uploaded_file)
-            
             st.write("JANコードが読み込まれました:", len(jan_df))
             jan_df.index = jan_df.index + 1
             height = min(len(jan_df) * 35 + 38, 800)
-            
-            st.dataframe(jan_df, use_container_width=True, height=height, key = "jancode_update")
+            st.dataframe(jan_df, use_container_width=True, height=height, key="jancode_update")
 
             jan_df.to_csv(config.JANCODE_SCV, index=False)
             st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
-
         else:
             try:
                 df = pd.read_csv(config.JANCODE_SCV)
                 df.index = df.index + 1
                 height = min(len(df) * 35 + 38, 800)
-                st.dataframe(df, use_container_width=True, height=height, key = "jancode_original")
-                
+                st.dataframe(df, use_container_width=True, height=height, key="jancode_original")
             except FileNotFoundError:
                 st.warning("JANコードデータはまだ利用できません。")
 
     def _setup_scraping_controls(self):
         st.subheader("スクレイピング制御")
-
         if self.running():
-            st.sidebar.button("停 止", type="primary", use_container_width=True,
-                            on_click=self.stop_running)
+            st.sidebar.button("停 止", type="primary", use_container_width=True, on_click=self.stop_running)
         else:
-            st.sidebar.button("開 始", type="secondary", use_container_width=True,
-                            on_click=self.start_running)
+            st.sidebar.button("開 始", type="secondary", use_container_width=True, on_click=self.start_running)
 
     def running(self):
-       return os.path.exists(config.RUNNING) 
-    
+        return os.path.exists(config.RUNNING)
+
     def start_running(self):
         if not self.running():
             os.makedirs(os.path.dirname(config.RUNNING), exist_ok=True)
@@ -154,31 +117,22 @@ class PriceScraperUI:
         file_path = Path(config.RUNNING)
         file_path.unlink()
 
-
     def display_main_content(self):
         try:
-            # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            
-            # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
 
             df = df.rename(columns=column_name_mapping)[ordered_columns]
-
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
             st.dataframe(df, use_container_width=True, height=height, key="result")
-
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
-
     def download_excel(self):
         try:
-            # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
 
@@ -187,7 +141,6 @@ class PriceScraperUI:
             temp_file_path = "/tmp/scraped_data_updated.xlsx"
             df.to_excel(temp_file_path, index=False)
 
-            # Provide an option to download the updated Excel file
             with open(temp_file_path, "rb") as file:
                 st.download_button(
                     label="ダウンロード",
@@ -197,25 +150,17 @@ class PriceScraperUI:
                     use_container_width=True
                 )
 
-            # Optionally, remove the temporary file after download
             os.remove(temp_file_path)
-
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
-            
     def run(self):
-        if not st.session_state.logged_in:
-            self.show_login_modal()
-        else:
-            st.sidebar.button("Logout", on_click=self.logout)
-            self.setup_sidebar()
-
-            tab1, tab2 = st.tabs([ "スクラップ価格", "JANコードデータ"])
-            with tab1:
-                self.display_main_content()
-            with tab2:
-                self._handle_file_upload()
+        self.setup_sidebar()
+        tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
+        with tab1:
+            self.display_main_content()
+        with tab2:
+            self._handle_file_upload()
 
 # Initialize and run the app
 app = PriceScraperUI()
