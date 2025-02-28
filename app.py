@@ -50,9 +50,7 @@ class PriceScraperUI:
 
 
     def show_login_modal(self):
-        with st.container():
-            # Modal overlay effect (simulated)
-            st.markdown(
+        st.markdown(
                 """
                 <style>
                 .modal-background {
@@ -75,29 +73,29 @@ class PriceScraperUI:
                     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
                     z-index: 1001;
                     width: 300px;
+                    text-align: center;
                 }
                 </style>
-                """, unsafe_allow_html=True)
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                """,
+                unsafe_allow_html=True,
+            )
 
-            # Modal background and content
-            st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
-            with st.container():
-                st.markdown('<div class="modal-content">', unsafe_allow_html=True)
-                st.subheader("Login to Your Account")
+        st.subheader("Login to Your Account")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
 
-                # Collecting user input
-                username = st.text_input("Username")
-                password = st.text_input("Password", type="password")
-                
-                login_button = st.button("Login")
-                if login_button:
-                    if self.check_credentials(username, password):
-                        st.session_state.logged_in = True
-                        st.success("Login successful!")
-                    else:
-                        st.error("Invalid username or password.")
+        if st.button("Login"):
+            if self.check_credentials(username, password):
+                st.session_state.logged_in = True
+                st.experimental_rerun()  # Refresh to hide modal
+            else:
+                st.error("Invalid username or password.")
 
-                st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        
 
     # Function to check login credentials
     def check_credentials(self, username, password):
