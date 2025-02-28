@@ -86,7 +86,7 @@ class PriceScraperUI:
         with col2:
             t1, t2, t3 = st.columns(3)
             with t2:
-                st.write("###Login")
+                st.subheader("Login")
 
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
