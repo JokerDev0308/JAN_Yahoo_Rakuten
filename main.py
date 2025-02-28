@@ -28,32 +28,40 @@ class PriceScraper:
                 while not self.running():
                     print("Running was stopped")
                     return
-
+    
                 jan = row['JAN']
+                saved_url = row.get('Yahoo URL')
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
                 
                 with ThreadPoolExecutor(max_workers=2) as executor:
-                    yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan)
-                    rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
-
+                    yahoo_future = executor.submit(
+                        self.yahoo_scraper.scrape_price, 
+                        jan,
+                        saved_url
+                    )
+                    rakuten_future = executor.submit(
+                        self.rakuten_scraper.scrape_price, 
+                        jan
+                    )
+    
                     yahoo_product = yahoo_future.result()
-
                     
                     self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                     self.calculate_prices_for_row(index)
-
+    
+                    # Save the URL for future use
                     self.df.at[index, 'Yahoo! Link'] = yahoo_product["url"]
                     self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
-                
-                
-                if (index + 1) % 10 == 0 or (index + 1) == total_records:  # Save more frequently
+                if (index + 1) % 10 == 0 or (index + 1) == total_records:
                     self.save_results()
-
-                sleep(1)  # Reduced sleep time
+                    self.save_yahoo_urls()  
+    
+                sleep(1)
         finally:
-            WebDriverManager.close_all()  # Ensure all drivers are closed
+            WebDriverManager.close_all()
+
             
     def calculate_prices_for_row(self, index):
         prices = [
@@ -93,6 +101,12 @@ class PriceScraper:
         self.df.to_excel(config.OUTPUT_XLSX, index=False)
         
         print(f"Progress saved to {config.OUTPUT_XLSX}")
+
+    def save_yahoo_urls(self):
+        """Save JANs and their corresponding Yahoo URLs"""
+        urls_df = self.df[['JAN', 'price', 'Yahoo! Link']].copy()
+        urls_df.to_csv(config.JANCODE_SCV, index=False)
+        print(f"URLs saved to {config.JANCODE_SCV}")
 
     def running(self):
        return os.path.exists(config.RUNNING)
