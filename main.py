@@ -54,11 +54,17 @@ class PriceScraper:
         if yahoo_price != np.nan and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
             min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
-            price_diff = float(row['price']) - min_price
+            
         elif yahoo_price != np.nan:
             min_price_url = yahoo_url
+            min_price = yahoo_price
         elif rakuten_price != "N/A":
             min_price_url = rakuten_url
+            min_price = rakuten_price
+
+
+        if min_price != np.nan:
+            price_diff = float(row['price']) - min_price
 
         return {
             'Yahoo Price': yahoo_price,
