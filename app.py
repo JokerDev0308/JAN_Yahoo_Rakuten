@@ -12,28 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Column name mappings
-column_name_mapping = {
-    'JAN': 'JAN（マスタ）',
-    'price': '価格（マスタ）',
-    'Yahoo Price': 'yahoo_実質価格',
-    'Rakuten Price': '楽天_実質価格',
-    'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-    'Min Price URL': '対象リンク（Y!と楽の安い方）',
-    'datetime': 'データ取得時間（Y!と楽の安い方）'
-}
-
-ordered_columns = [
-    'JAN（マスタ）',
-    '価格（マスタ）',
-    'yahoo_実質価格',
-    '楽天_実質価格',
-    '価格差（マスタ価格‐Y!と楽の安い方）',
-    '対象リンク（Y!と楽の安い方）',
-    'データ取得時間（Y!と楽の安い方）'
-]
-
-# Initialize authentication state
+# Authentication state
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
@@ -46,17 +25,20 @@ def authenticate(username, password):
     else:
         st.error("Invalid username or password")
 
-# Show login modal if the user is not authenticated
+# Simulated Modal: Show login screen if not authenticated
 if not st.session_state.authenticated:
-    with st.modal("Login", closable=False):
-        st.write("### ログインが必要です")
-        username = st.text_input("ユーザー名", key="username")
-        password = st.text_input("パスワード", type="password", key="password")
+    login_container = st.empty()
+    
+    with login_container.container():
+        st.markdown("### 🔒 ログインが必要です")
+        username = st.text_input("ユーザー名")
+        password = st.text_input("パスワード", type="password")
         if st.button("ログイン"):
             authenticate(username, password)
-    st.stop()  # Prevents unauthorized users from accessing the app
 
-# Main application class
+    st.stop()  # Block the app until authenticated
+
+# Main app class
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
@@ -76,26 +58,6 @@ class PriceScraperUI:
             if st.button("ログアウト", use_container_width=True):
                 st.session_state.authenticated = False
                 st.rerun()
-
-    def _handle_file_upload(self):
-        uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
-        if uploaded_file is not None:
-            jan_df = pd.read_csv(uploaded_file)
-            st.write("JANコードが読み込まれました:", len(jan_df))
-            jan_df.index = jan_df.index + 1
-            height = min(len(jan_df) * 35 + 38, 800)
-            st.dataframe(jan_df, use_container_width=True, height=height, key="jancode_update")
-
-            jan_df.to_csv(config.JANCODE_SCV, index=False)
-            st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
-        else:
-            try:
-                df = pd.read_csv(config.JANCODE_SCV)
-                df.index = df.index + 1
-                height = min(len(df) * 35 + 38, 800)
-                st.dataframe(df, use_container_width=True, height=height, key="jancode_original")
-            except FileNotFoundError:
-                st.warning("JANコードデータはまだ利用できません。")
 
     def _setup_scraping_controls(self):
         st.subheader("スクレイピング制御")
@@ -123,10 +85,7 @@ class PriceScraperUI:
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
 
-            df = df.rename(columns=column_name_mapping)[ordered_columns]
-            df.index = df.index + 1
-            height = min(len(df) * 35 + 38, 800)
-            st.dataframe(df, use_container_width=True, height=height, key="result")
+            st.dataframe(df, use_container_width=True)
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
@@ -136,16 +95,14 @@ class PriceScraperUI:
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
 
-            df = df.rename(columns=column_name_mapping)[ordered_columns]
-
-            temp_file_path = "/tmp/scraped_data_updated.xlsx"
+            temp_file_path = "/tmp/scraped_data.xlsx"
             df.to_excel(temp_file_path, index=False)
 
             with open(temp_file_path, "rb") as file:
                 st.download_button(
                     label="ダウンロード",
                     data=file,
-                    file_name="scraped_data_updated.xlsx",
+                    file_name="scraped_data.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True
                 )
@@ -160,8 +117,8 @@ class PriceScraperUI:
         with tab1:
             self.display_main_content()
         with tab2:
-            self._handle_file_upload()
+            st.write("ここでファイルアップロードができます。")
 
-# Initialize and run the app
+# Run the app
 app = PriceScraperUI()
 app.run()
