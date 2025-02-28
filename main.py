@@ -113,11 +113,16 @@ class PriceScraper:
 
 def main():
     try:
+        i = 0
         while True:
+            print(f"init=={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             scraper = PriceScraper()
             scraper.load_data()
+            print(f"loading =={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             scraper.scrape_running()
+            print(f"scraping =={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             sleep(5)
+            i += 1
     except KeyboardInterrupt:
         WebDriverManager.close_all()
 
