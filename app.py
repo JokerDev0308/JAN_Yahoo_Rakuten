@@ -91,6 +91,13 @@ class PriceScraperUI:
                     padding: 5rem !important;
                 }
                 
+                @media (max-width: 1440px) {
+                    padding: 3rem !important;
+                }
+
+                @media (max-width: 1280px) {
+                    padding: 1rem !important;
+                }
                 </style>
                 """, unsafe_allow_html=True)
             
