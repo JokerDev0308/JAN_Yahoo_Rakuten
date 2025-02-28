@@ -1,4 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
+
 import pandas as pd
 import config
 import os
@@ -11,11 +13,20 @@ session_manager = SessionManager()
 def authenticate(username: str, password: str) -> bool:
     if session_manager.validate_user(username, password):
         config.CURRENT_USER = username
-        config.LOGIN_STATE = True
+        session = get_cookie("ajs_anonymous_id")
+        config.LOGIN_STATE[session] = True
         return True
     return False
 
-
+def get_cookie(name):
+    cookie_value = components.html(f"""
+        <script>
+        var name = "{name}";
+        var value = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)" + name + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1");
+        window.parent.postMessage(value, "*");
+        </script>
+    """, height=0, width=0)
+    return cookie_value
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -185,12 +196,14 @@ class PriceScraperUI:
 
     
     def logout(self):
-        config.LOGIN_STATE = False
+        session = get_cookie("ajs_anonymous_id")
+        config.LOGIN_STATE[session] = False
         config.CURRENT_USER = None
         st.rerun()
 
     def run(self):
-        if config.LOGIN_STATE:
+        session = get_cookie("ajs_anonymous_id")
+        if config.LOGIN_STATE[session]:
             self.setup_sidebar()
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
