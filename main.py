@@ -47,16 +47,20 @@ class PriceScraper:
                     yahoo_product = yahoo_future.result()
                     print(f"Yahoo Product: {yahoo_product}")  # Debugging print statement
 
+                    # Check if yahoo_product is a dictionary
                     if isinstance(yahoo_product, dict) and "price" in yahoo_product:
-                        self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
+                        cleaned_price = yahoo_product["price"].strip()  # Strip the newline or extra spaces
+                        self.df.at[index, 'Yahoo Price'] = cleaned_price
+                        self.df.at[index, 'Yahoo! Link'] = yahoo_product.get("url", "N/A")
                     else:
+                        # If yahoo_product is not a dictionary, handle it as an error
                         self.df.at[index, 'Yahoo Price'] = "N/A"
+                        self.df.at[index, 'Yahoo! Link'] = "N/A"
 
+                    # Continue with the Rakuten scraping
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                     self.calculate_prices_for_row(index)
 
-                    # Save the URL for future use
-                    self.df.at[index, 'Yahoo! Link'] = yahoo_product.get("url", "N/A")
                     self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
                 if (index + 1) % 10 == 0 or (index + 1) == total_records:
@@ -66,6 +70,7 @@ class PriceScraper:
                 sleep(1)
         finally:
             WebDriverManager.close_all()
+
 
 
             
