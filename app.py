@@ -84,31 +84,10 @@ class PriceScraperUI:
     def show_login_modal(self):
         col1, col2, col3 = st.columns(3)
         with col2:
-            st.markdown(
-                """
-                <style>
-                .st-emotion-cache-qcpnpn {
-                    padding: 5rem !important;
-                }
-                
-                @media (max-width: 1440px) {
-                    .st-emotion-cache-qcpnpn {
-                        padding: 3rem !important;
-                    }
-                }
-
-                @media (max-width: 1280px) {
-                    .st-emotion-cache-qcpnpn {
-                        padding: 1rem !important;
-                    }
-                }
-                </style>
-                """, unsafe_allow_html=True)
-            
+                        
             with st.container(border=True):
-                t1, t2, t3 = st.columns(3)
-                with t2:
-                    st.subheader("Login")
+                
+                st.subheader("Login")
 
                 username = st.text_input("Username")
                 password = st.text_input("Password", type="password")
