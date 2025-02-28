@@ -202,8 +202,8 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
-        session = get_cookie("ajs_anonymous_id")
-        st.write(session)
+        session1 = get_cookie("ajs_anonymous_id")
+        st.write(session1)
         # if config.LOGIN_STATE[session]:
         #     self.setup_sidebar()
         #     tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
