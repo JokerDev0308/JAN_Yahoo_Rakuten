@@ -48,8 +48,8 @@ class PriceScraper:
 
                     # Check if yahoo_product is a dictionary
                     if isinstance(yahoo_product, dict) and "price" in yahoo_product:
-                        cleaned_price = yahoo_product["price"].strip()  # Strip the newline or extra spaces
-                        self.df.at[index, 'Yahoo Price'] = cleaned_price
+                        yahoo_price = yahoo_product["price"]
+                        self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
                         self.df.at[index, 'Yahoo! Link'] = yahoo_product.get("url", "N/A")
                     else:
                         # If yahoo_product is not a dictionary, handle it as an error
@@ -57,8 +57,32 @@ class PriceScraper:
                         self.df.at[index, 'Yahoo! Link'] = "N/A"
 
                     # Continue with the Rakuten scraping
-                    self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
-                    self.calculate_prices_for_row(index)
+                    rakuten_price = rakuten_future.result()
+                    self.df.at[index, 'Rakuten Price'] = rakuten_price
+
+                    # Compare Yahoo and Rakuten prices and store the URL of the minimum price
+                    if yahoo_price != "N/A" and rakuten_price != "N/A":
+                        min_price = min(float(yahoo_price), float(rakuten_price))
+                        if min_price == float(yahoo_price):
+                            self.df.at[index, 'Min Price URL'] = yahoo_product.get("url", "N/A")
+                        else:
+                            # Assuming Rakuten doesn't have a URL for each product, use a placeholder or provide Rakuten URL if available
+                            self.df.at[index, 'Min Price URL'] = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/" 
+                    elif yahoo_price != "N/A":  
+                        self.df.at[index, 'Min Price URL'] = yahoo_product.get("url", "N/A")
+                    elif rakuten_price != "N/A":  
+                        self.df.at[index, 'Min Price URL'] = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0/"
+                    else:
+                        self.df.at[index, 'Min Price URL'] = "N/A"
+
+                    # Calculate the price difference
+                    # Assuming 'price' column is the original master price (as in your first code)
+                    if yahoo_price != "N/A" and rakuten_price != "N/A":
+                        price_diff = float(row['price']) - min_price
+                    else:
+                        price_diff = "N/A"
+                        
+                    self.df.at[index, 'Price Difference'] = price_diff
 
                     self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
@@ -71,25 +95,6 @@ class PriceScraper:
             WebDriverManager.close_all()
 
 
-
-            
-    def calculate_prices_for_row(self, index):
-        prices = [
-            # self.df.at[index, 'Amazon Price'],
-            self.df.at[index, 'Yahoo Price'],
-            self.df.at[index, 'Rakuten Price']
-        ]
-
-        # Filter out "N/A" values and convert valid prices to numeric
-        valid_prices = [float(price) for price in prices if price != "N/A" and price is not None]
-
-        # If there are valid prices, calculate the minimum; otherwise, handle the "no valid prices" case
-        if valid_prices:
-            min_price = min(valid_prices)
-        else:
-            min_price = "N/A"
-            
-        self.df.at[index, 'Price Difference'] = self.df.at[index, 'price'] - min_price
 
 
     def save_results(self):
@@ -110,12 +115,12 @@ def main():
     try:
         i = 0
         while True:
-            print(f"init=={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print(f"init=={i}==", datetime.now())
             scraper = PriceScraper()
             scraper.load_data()
-            print(f"loading =={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print(f"loading =={i}==", datetime.now())
             scraper.scrape_running()
-            print(f"scraping =={i}==", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print(f"scraping =={i}==", datetime.now())
             sleep(5)
             i += 1
     except KeyboardInterrupt:

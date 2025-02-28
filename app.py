@@ -17,7 +17,7 @@ column_name_mapping = {
         'Yahoo Price': 'yahoo_実質価格',
         'Rakuten Price': '楽天_実質価格',
         'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-        'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
+        'Min Price URL': '対象リンク（Y!と楽の安い方）',
         'datetime': 'データ取得時間（Y!と楽の安い方）'
     }
 
