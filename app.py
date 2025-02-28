@@ -79,6 +79,8 @@ class PriceScraperUI:
             if st.button("ログアウト", use_container_width=True):
                 st.session_state.authenticated = False
                 st.rerun()
+
+
     @st.dialog("login", width="small")
     def show_login_modal(self):
         # Use an empty container to simulate a modal dialog
@@ -92,6 +94,7 @@ class PriceScraperUI:
                 if authenticate(username, password):
                     st.session_state.logged_in = True
                     st.success("Login successful!")
+                    st.rerun()
                 else:
                     st.error("Invalid username or password.")
 
