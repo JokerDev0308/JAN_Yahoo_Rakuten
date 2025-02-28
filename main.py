@@ -30,7 +30,7 @@ class PriceScraper:
                     return
 
                 jan = row['JAN']
-                saved_url = row.get('Yahoo URL')
+                saved_url = row.get('Yahoo! Link')
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
                 
                 with ThreadPoolExecutor(max_workers=2) as executor:
