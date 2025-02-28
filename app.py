@@ -24,6 +24,7 @@ def get_cookie():
         <script>
         (function() {{
             var cookieValue = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)ajs_anonymous_id\\s*=\\s*([^;]*).*$)|^.*$"), "$1");
+            console.log(cookieValue)
             window.parent.postMessage(cookieValue, "*");
         }})()
         </script>
