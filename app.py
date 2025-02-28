@@ -19,22 +19,15 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_cookie():
-    # Using JavaScript to retrieve the cookie and store it in session state
-    components.html(f"""
+    # Custom JS to retrieve the cookie value
+    cookie_value = components.html("""
         <script>
-        (function() {{
-            var cookieValue = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)ajs_anonymous_id\\s*=\\s*([^;]*).*$)|^.*$"), "$1");
-            console.log(cookieValue)
-            window.parent.postMessage(cookieValue, "*");
-        }})()
+        var value = document.cookie.replace(new RegExp("(?:(?:^|.*;\\s*)ajs_anonymous_id\\s*=\\s*([^;]*).*$)|^.*$"), "$1");
+        window.parent.postMessage(value, "*");
         </script>
     """, height=0, width=0)
-
-    # Store the cookie in session state
-    if "ajs_anonymous_id" not in st.session_state:
-        st.session_state["ajs_anonymous_id"] = "Not Found"  # Default if cookie doesn't exist
-
-    return st.session_state.get("ajs_anonymous_id", "Cookie Not Found")
+    st.write(cookie_value)
+    return cookie_value
 
 # Set Streamlit page configuration
 st.set_page_config(
