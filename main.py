@@ -83,18 +83,18 @@ class PriceScraper:
 
 
     def save_results(self):
-        column_name_mapping = {
-            'JAN': 'JAN（マスタ）',
-            'price': '価格（マスタ）',
-            'Yahoo Price': 'yahoo_実質価格',
-            'Rakuten Price': '楽天_実質価格',
-            'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-            'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
-            'datetime': 'データ取得時間（Y!と楽の安い方）'
-        }
+        # column_name_mapping = {
+        #     'JAN': 'JAN（マスタ）',
+        #     'price': '価格（マスタ）',
+        #     'Yahoo Price': 'yahoo_実質価格',
+        #     'Rakuten Price': '楽天_実質価格',
+        #     'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
+        #     'Yahoo! Link': '対象リンク（Y!と楽の安い方）',
+        #     'datetime': 'データ取得時間（Y!と楽の安い方）'
+        # }
 
         # Rename columns using the mapping
-        self.df.rename(columns=column_name_mapping, inplace=True)
+        # self.df.rename(columns=column_name_mapping, inplace=True)
 
         # Create the directory if it doesn't exist and save the DataFrame to an Excel file
         os.makedirs(os.path.dirname(config.OUTPUT_XLSX), exist_ok=True)
