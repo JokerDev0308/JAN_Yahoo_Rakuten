@@ -21,6 +21,16 @@ column_name_mapping = {
         'datetime': 'データ取得時間（Y!と楽の安い方）'
     }
 
+ordered_columns = [
+            'JAN（マスタ）',
+            '価格（マスタ）',
+            'yahoo_実質価格',
+            '楽天_実質価格',
+            '価格差（マスタ価格‐Y!と楽の安い方）',
+            '対象リンク（Y!と楽の安い方）',
+            'データ取得時間（Y!と楽の安い方）'
+        ]
+
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
@@ -88,13 +98,11 @@ class PriceScraperUI:
         try:
             # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            df.rename(columns=column_name_mapping, inplace=True)
+            df.rename(columns=column_name_mapping, inplace=True)[ordered_columns]
 
             # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
-
-            df = df[column_name_mapping]
 
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
@@ -108,13 +116,11 @@ class PriceScraperUI:
         try:
             # Load the DataFrame from the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
-            df.rename(columns=column_name_mapping, inplace=True)
+            df.rename(columns=column_name_mapping, inplace=True)[ordered_columns]
 
             # Drop the "Yahoo! Link" column
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
-            
-            df = df[column_name_mapping]
 
             temp_file_path = "/tmp/scraped_data_updated.xlsx"
             df.to_excel(temp_file_path, index=False)
