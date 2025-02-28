@@ -33,17 +33,6 @@ ordered_columns = [
 
 st.markdown("""
     <style>
-    .modal {
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 20px;
-        z-index: 9999;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
     .modal-background {
         position: fixed;
         top: 0;
@@ -52,6 +41,25 @@ st.markdown("""
         height: 100%;
         background: rgba(0, 0, 0, 0.5);
         z-index: 9998;
+    }
+    .modal {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        width: 90%;
+        max-width: 400px;  /* Set a maximum width for the modal */
+        z-index: 9999;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    @media (max-width: 600px) {
+        .modal {
+            width: 80%;  /* Adjust modal width on smaller screens */
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -73,24 +81,19 @@ class PriceScraperUI:
             self.download_excel()
 
     def show_login_modal(self):
-        st.markdown('<div class="modal">', unsafe_allow_html=True)
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        login_button = st.button("Login")
-
-        if login_button:
-            if username == "admin" and password == "password":
-                st.session_state.logged_in = True
-                st.success("Login successful!")
-            else:
-                st.error("Invalid username or password!")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-
-        # Optional: Close button or action
-        if st.button("Close Modal"):
-            st.session_state.logged_in = False
-            st.experimental_rerun()
+        # Create a form in the modal
+        with st.form(key="login_form"):
+            st.write("### Login")
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            login_button = st.form_submit_button("Login")
+            
+            if login_button:
+                if username == "admin" and password == "password":  # Example authentication
+                    st.session_state.logged_in = True
+                    st.success("Login successful!")
+                else:
+                    st.error("Invalid username or password!")
 
     def logout(self):
         st.session_state.logged_in = False
@@ -196,6 +199,7 @@ class PriceScraperUI:
             
     def run(self):
         if not st.session_state.logged_in:
+            st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
             self.show_login_modal()
         else:
             st.sidebar.button("Logout", on_click=self.logout)
