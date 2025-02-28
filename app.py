@@ -49,20 +49,60 @@ class PriceScraperUI:
             self.download_excel()
 
 
-    @st.dialog("### Login", width="small")
     def show_login_modal(self):
-        # Create a form in the modal
-        with st.form(key="login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            login_button = st.form_submit_button("Login")
-            
-            if login_button:
-                if username == "admin" and password == "password":  # Example authentication
-                    st.session_state.logged_in = True
-                    st.success("Login successful!")
-                else:
-                    st.error("Invalid username or password!")
+        with st.container():
+            # Modal overlay effect (simulated)
+            st.markdown(
+                """
+                <style>
+                .modal-background {
+                    background-color: rgba(0, 0, 0, 0.5);
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 1000;
+                }
+                .modal-content {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                    z-index: 1001;
+                    width: 300px;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+            # Modal background and content
+            st.markdown('<div class="modal-background"></div>', unsafe_allow_html=True)
+            with st.container():
+                st.markdown('<div class="modal-content">', unsafe_allow_html=True)
+                st.subheader("Login to Your Account")
+
+                # Collecting user input
+                username = st.text_input("Username")
+                password = st.text_input("Password", type="password")
+                
+                login_button = st.button("Login")
+                if login_button:
+                    if self.check_credentials(username, password):
+                        st.session_state.logged_in = True
+                        st.success("Login successful!")
+                    else:
+                        st.error("Invalid username or password.")
+
+                st.markdown('</div>', unsafe_allow_html=True)
+
+    # Function to check login credentials
+    def check_credentials(self, username, password):
+        # Dummy credentials for demonstration
+        return username == "admin" and password == "password123"
 
     def logout(self):
         st.session_state.logged_in = False
