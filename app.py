@@ -203,15 +203,16 @@ class PriceScraperUI:
 
     def run(self):
         session = get_cookie("ajs_anonymous_id")
-        if config.LOGIN_STATE[session]:
-            self.setup_sidebar()
-            tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
-            with tab1:
-                self.display_main_content()
-            with tab2:
-                self._handle_file_upload()
-        else:
-            self.show_login_modal()
+        st.write(session)
+        # if config.LOGIN_STATE[session]:
+        #     self.setup_sidebar()
+        #     tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
+        #     with tab1:
+        #         self.display_main_content()
+        #     with tab2:
+        #         self._handle_file_upload()
+        # else:
+        #     self.show_login_modal()
 
 # Initialize and run the app
 app = PriceScraperUI()
