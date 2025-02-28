@@ -216,12 +216,15 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
-        self.setup_sidebar()
-        tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
-        with tab1:
-            self.display_main_content()
-        with tab2:
-            self._handle_file_upload()
+        if st.session_state.authenticated:
+            self.setup_sidebar()
+            tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
+            with tab1:
+                self.display_main_content()
+            with tab2:
+                self._handle_file_upload()
+        else:
+            self.show_login_modal()
 
 # Initialize and run the app
 app = PriceScraperUI()
