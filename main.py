@@ -28,7 +28,7 @@ class PriceScraper:
                 while not self.running():
                     print("Running was stopped")
                     return
-    
+
                 jan = row['JAN']
                 saved_url = row.get('Yahoo URL')
                 print(f"Processing {index + 1}/{total_records}: JAN {jan}")
@@ -43,24 +43,30 @@ class PriceScraper:
                         self.rakuten_scraper.scrape_price, 
                         jan
                     )
-    
+
                     yahoo_product = yahoo_future.result()
-                    
-                    self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
+                    print(f"Yahoo Product: {yahoo_product}")  # Debugging print statement
+
+                    if isinstance(yahoo_product, dict) and "price" in yahoo_product:
+                        self.df.at[index, 'Yahoo Price'] = yahoo_product["price"]
+                    else:
+                        self.df.at[index, 'Yahoo Price'] = "N/A"
+
                     self.df.at[index, 'Rakuten Price'] = rakuten_future.result()
                     self.calculate_prices_for_row(index)
-    
+
                     # Save the URL for future use
-                    self.df.at[index, 'Yahoo! Link'] = yahoo_product["url"]
+                    self.df.at[index, 'Yahoo! Link'] = yahoo_product.get("url", "N/A")
                     self.df.at[index, 'datetime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
                 if (index + 1) % 10 == 0 or (index + 1) == total_records:
                     self.save_results()
                     self.save_yahoo_urls()  
-    
+
                 sleep(1)
         finally:
             WebDriverManager.close_all()
+
 
             
     def calculate_prices_for_row(self, index):
