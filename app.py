@@ -84,7 +84,10 @@ class PriceScraperUI:
     def show_login_modal(self):
         col1, col2, col3 = st.columns(3)
         with col2:
-            # Collecting user input
+            t1, t2, t3 = st.columns(3)
+            with t2:
+                st.write("###Login")
+
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             
