@@ -48,10 +48,11 @@ class PriceScraperUI:
             
             self.download_excel()
 
+
+    @st.dialog("### Login", width="small")
     def show_login_modal(self):
         # Create a form in the modal
         with st.form(key="login_form"):
-            st.write("### Login")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             login_button = st.form_submit_button("Login")
