@@ -46,16 +46,16 @@ class PriceScraper:
 
                     yahoo_product = yahoo_future.result()
 
-                    # Check if yahoo_product is a dictionary
+                    # Check if yahoo_product is "N/A" or valid data
                     if yahoo_product == "N/A":
-                        yahoo_price = yahoo_product["price"]
-                        yahoo_url = yahoo_product.get("url", "N/A")
-                        self.df.at[index, 'Yahoo Price'] = yahoo_price
-                        self.df.at[index, 'Yahoo! Link'] = yahoo_url
+                        yahoo_price = "N/A"
+                        yahoo_url = "N/A"
                     else:
-                        # If yahoo_product is not a dictionary, handle it as an error
-                        self.df.at[index, 'Yahoo Price'] = "N/A"
-                        self.df.at[index, 'Yahoo! Link'] = "N/A"
+                        yahoo_price = yahoo_product.get("price", "N/A")
+                        yahoo_url = yahoo_product.get("url", "N/A")
+
+                    self.df.at[index, 'Yahoo Price'] = yahoo_price
+                    self.df.at[index, 'Yahoo! Link'] = yahoo_url
 
                     # Continue with the Rakuten scraping
                     rakuten_price = rakuten_future.result()
@@ -94,6 +94,7 @@ class PriceScraper:
                 sleep(1)
         finally:
             WebDriverManager.close_all()
+
 
 
 
