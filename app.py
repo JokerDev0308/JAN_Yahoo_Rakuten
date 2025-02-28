@@ -88,14 +88,16 @@ class PriceScraperUI:
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             
-            login_button = st.button("Login")
-            if login_button:
-                if authenticate(username, password):
-                    st.session_state.logged_in = True
-                    st.success("Login successful!")
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password.")
+            p1, p2, p3 = st.columns(3)
+            with p2:
+                login_button = st.button("Login", use_container_width = True)
+                if login_button:
+                    if authenticate(username, password):
+                        st.session_state.logged_in = True
+                        st.success("Login successful!")
+                        st.rerun()
+                    else:
+                        st.error("Invalid username or password.")
 
 
     def _handle_file_upload(self):
