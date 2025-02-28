@@ -35,12 +35,12 @@ class PriceScraper:
             yahoo_product = yahoo_future.result()
             rakuten_price = rakuten_future.result()
 
-        # Handle Yahoo product price and URL, default to np.nan if not available
+        # Handle Yahoo product price and URL, default to None if not available
         if yahoo_product != "N/A":
-            yahoo_price = yahoo_product.get("price", np.nan)
+            yahoo_price = yahoo_product.get("price", None)
             yahoo_url = yahoo_product.get("url", "N/A")
         else:
-            yahoo_price = np.nan
+            yahoo_price = None
             yahoo_url = "N/A"
 
         # Rakuten URL generation
@@ -48,14 +48,14 @@ class PriceScraper:
 
         # Initialize default values
         min_price_url = "N/A"
-        price_diff = np.nan
+        price_diff = None
 
         # Determine minimum price and price difference
-        if yahoo_price != np.nan and rakuten_price != "N/A":
+        if yahoo_price != None and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
             min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
             
-        elif yahoo_price != np.nan:
+        elif yahoo_price != None:
             min_price_url = yahoo_url
             min_price = yahoo_price
         elif rakuten_price != "N/A":
@@ -127,14 +127,11 @@ class PriceScraper:
 
 def main():
     try:
-        iteration = 0
         while True:
-            print(f"Iteration {iteration} started at {datetime.now()}")
             scraper = PriceScraper()
             scraper.load_data()
             scraper.scrape_running()
             sleep(5)
-            iteration += 1
     except KeyboardInterrupt:
         WebDriverManager.close_all()
 
