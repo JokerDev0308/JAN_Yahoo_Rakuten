@@ -47,7 +47,7 @@ class PriceScraperUI:
             
             self.download_excel()
 
-    def show_login_modal():
+    def show_login_modal(self):
         # Create a form in the modal
         with st.form(key="login_form"):
             st.write("### Login")
