@@ -3,9 +3,7 @@ import pandas as pd
 import config
 import os
 from pathlib import Path
-import bcrypt
 
-# Set page configuration
 st.set_page_config(
     page_title="JANコード価格スクレーパーモニター",
     page_icon="📊",
@@ -13,76 +11,85 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Column name mapping and ordering
 column_name_mapping = {
-    'JAN': 'JAN（マスタ）',
-    'price': '価格（マスタ）',
-    'Yahoo Price': 'yahoo_実質価格',
-    'Rakuten Price': '楽天_実質価格',
-    'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-    'Min Price URL': '対象リンク（Y!と楽の安い方）',
-    'datetime': 'データ取得時間（Y!と楽の安い方）'
-}
+        'JAN': 'JAN（マスタ）',
+        'price': '価格（マスタ）',
+        'Yahoo Price': 'yahoo_実質価格',
+        'Rakuten Price': '楽天_実質価格',
+        'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
+        'Min Price URL': '対象リンク（Y!と楽の安い方）',
+        'datetime': 'データ取得時間（Y!と楽の安い方）'
+    }
 
 ordered_columns = [
-    'JAN（マスタ）',
-    '価格（マスタ）',
-    'yahoo_実質価格',
-    '楽天_実質価格',
-    '価格差（マスタ価格‐Y!と楽の安い方）',
-    '対象リンク（Y!と楽の安い方）',
-    'データ取得時間（Y!と楽の安い方）'
-]
+            'JAN（マスタ）',
+            '価格（マスタ）',
+            'yahoo_実質価格',
+            '楽天_実質価格',
+            '価格差（マスタ価格‐Y!と楽の安い方）',
+            '対象リンク（Y!と楽の安い方）',
+            'データ取得時間（Y!と楽の安い方）'
+        ]
 
-# Class for price scraper UI
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
         self.Running = False
+        if "logged_in" not in st.session_state:
+            st.session_state.logged_in = False
         
     def setup_sidebar(self):
         with st.sidebar:
-            if 'logged_in' not in st.session_state or not st.session_state.logged_in:
-                self._setup_login()
-            else:
-                self._setup_scraping_controls()
+            self._setup_scraping_controls()
 
             if st.button('リロード', use_container_width=True):
                 st.rerun()
             
-            if 'logged_in' in st.session_state and st.session_state.logged_in:
-                self.download_excel()
+            self.download_excel()
 
-    def _setup_login(self):
-        st.subheader("ログイン")
+    def show_login_modal(self):
+        # Create a container for the modal content
+        with st.expander("Login", expanded=False):
+            st.write("### Login")
+            username = st.text_input("Username", key="username")
+            password = st.text_input("Password", type="password", key="password")
+            login_button = st.button("Login")
 
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+            if login_button:
+                if username == "admin" and password == "password":  # Replace with real authentication logic
+                    st.session_state.logged_in = True
+                    st.success("Login successful!")
+                else:
+                    st.error("Invalid username or password!")
 
-        if st.button("ログイン"):
-            if self.check_login(username, password):
-                st.session_state.logged_in = True
-                st.session_state.username = username
-                st.success(f"ようこそ、{username}さん!")
-                st.experimental_rerun()
-            else:
-                st.error("無効なユーザー名またはパスワードです。")
+    def logout(self):
+        st.session_state.logged_in = False
+        st.experimental_rerun()
+            
 
-    def check_login(self, username, password):
-        try:
-            # Load user data from CSV
-            df = pd.read_csv('users.csv')
-            user = df[df['username'] == username]
+    def _handle_file_upload(self):
+        uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
+        if uploaded_file is not None:
+            jan_df = pd.read_csv(uploaded_file)
+            
+            st.write("JANコードが読み込まれました:", len(jan_df))
+            jan_df.index = jan_df.index + 1
+            height = min(len(jan_df) * 35 + 38, 800)
+            
+            st.dataframe(jan_df, use_container_width=True, height=height, key = "jancode_update")
 
-            if not user.empty:
-                stored_hashed_password = user.iloc[0]['password'].encode('utf-8')
+            jan_df.to_csv(config.JANCODE_SCV, index=False)
+            st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
 
-                # Check if entered password matches the stored hashed password
-                if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
-                    return True
-        except FileNotFoundError:
-            st.error("ユーザーデータベースが見つかりません。")
-        return False
+        else:
+            try:
+                df = pd.read_csv(config.JANCODE_SCV)
+                df.index = df.index + 1
+                height = min(len(df) * 35 + 38, 800)
+                st.dataframe(df, use_container_width=True, height=height, key = "jancode_original")
+                
+            except FileNotFoundError:
+                st.warning("JANコードデータはまだ利用できません。")
 
     def _setup_scraping_controls(self):
         st.subheader("スクレイピング制御")
@@ -107,6 +114,7 @@ class PriceScraperUI:
         file_path = Path(config.RUNNING)
         file_path.unlink()
 
+
     def display_main_content(self):
         try:
             # Load the DataFrame from the Excel file
@@ -124,6 +132,7 @@ class PriceScraperUI:
 
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
+
 
     def download_excel(self):
         try:
@@ -154,41 +163,21 @@ class PriceScraperUI:
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
-    def _handle_file_upload(self):
-        uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
-        if uploaded_file is not None:
-            jan_df = pd.read_csv(uploaded_file)
             
-            st.write("JANコードが読み込まれました:", len(jan_df))
-            jan_df.index = jan_df.index + 1
-            height = min(len(jan_df) * 35 + 38, 800)
-            
-            st.dataframe(jan_df, use_container_width=True, height=height, key="jancode_update")
-
-            jan_df.to_csv(config.JANCODE_SCV, index=False)
-            st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
-
-        else:
-            try:
-                df = pd.read_csv(config.JANCODE_SCV)
-                df.index = df.index + 1
-                height = min(len(df) * 35 + 38, 800)
-                st.dataframe(df, use_container_width=True, height=height, key="jancode_original")
-                
-            except FileNotFoundError:
-                st.warning("JANコードデータはまだ利用できません。")
-
     def run(self):
-        self.setup_sidebar()
+        if not st.session_state.logged_in:
+            st.write("### Please log in to access the app:")
+            self.show_login_modal()
+        else:
+            st.write("### Welcome to the App!")
+            st.sidebar.button("Logout", on_click=self.logout)
+            self.setup_sidebar()
 
-        tab1, tab2 = st.tabs([ "スクラップ価格", "JANコードデータ"])
-
-        with tab1:
-            self.display_main_content()
-
-        with tab2:
-            self._handle_file_upload()
-
+            tab1, tab2 = st.tabs([ "スクラップ価格", "JANコードデータ"])
+            with tab1:
+                self.display_main_content()
+            with tab2:
+                self._handle_file_upload()
 
 # Initialize and run the app
 app = PriceScraperUI()
