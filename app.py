@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from session_manager import SessionManager
 import config
+from http.cookies import SimpleCookie
 
 session_manager = SessionManager()
 
@@ -21,6 +22,13 @@ def authenticate(username: str, password: str) -> bool:
 #     params = st.query_params()
 #     cookie_value = params.get("X", [""])[0]  
 #     return cookie_value
+
+def get_or_set_uid():
+    # Read cookies from HTTP headers
+    cookie_string = st.request.headers.get("cookie", "")
+    cookies = SimpleCookie()
+    cookies.load(cookie_string)
+    return cookies
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -199,7 +207,7 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
-        st.write(st.experimental_user)
+        st.write(self.get_or_set_uid())
         #session = get_session_id()
         # if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
         if st.session_state.logged_in:
