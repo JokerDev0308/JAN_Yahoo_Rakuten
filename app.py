@@ -1,14 +1,15 @@
 import streamlit as st
+
 import pandas as pd
+import config
 import os
 from pathlib import Path
-import config
 from session_manager import SessionManager
+import config
 
 session_manager = SessionManager()
 
 def authenticate(username: str, password: str) -> bool:
-    """Authenticate user"""
     if session_manager.validate_user(username, password):
         config.CURRENT_USER = username
         session = get_session_id()
@@ -17,8 +18,8 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_session_id():
-    """Get session ID"""
-    return "Admin"  # Dummy value for simplicity
+    cookie_value = "Admin"
+    return cookie_value
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -49,87 +50,86 @@ ordered_columns = [
     'データ取得時間（Y!と楽の安い方）'
 ]
 
+# Main application class
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
-        self.running = False
 
     def setup_sidebar(self):
-        """Setup the sidebar for user control"""
         with st.sidebar:
             st.subheader("メニュー")
             self._setup_scraping_controls()
+
             if st.button('リロード', use_container_width=True):
-                st.experimental_rerun()  # Modern way to force a rerun
+                st.rerun()
 
             self.download_excel()
 
+            # Logout button
             if st.button("ログアウト", use_container_width=True):
                 self.logout()
 
+
     def show_login_modal(self):
-        """Display login modal for user authentication"""
         col1, col2, col3 = st.columns(3)
         with col2:
-            with st.container():
-                st.markdown("""
+                        
+            with st.container(border=True):
+
+                st.markdown(
+                    """
                     <style>
                         #login{
                             text-align:center;
                         }
+
                         .stButton{
                             text-align:center;
                         }
+
                         .stButton>button{
                             min-width:7rem;
                         }
                     </style>
-                """, unsafe_allow_html=True)
-
+                    """
+                , unsafe_allow_html=True)
+                
                 st.subheader("Login")
+
                 username = st.text_input("Username")
                 password = st.text_input("Password", type="password")
-
+                
                 login_button = st.button("Login")
                 if login_button:
                     if authenticate(username, password):
                         st.session_state.logged_in = True
                         st.success("Login successful!")
-                        st.experimental_rerun()  # Re-run to initialize the session
+                        st.rerun()
                     else:
                         st.error("Invalid username or password.")
 
+
     def _handle_file_upload(self):
-        """Handle file upload functionality for JAN codes"""
         uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
         if uploaded_file is not None:
-            try:
-                jan_df = pd.read_csv(uploaded_file)
-                st.write("JANコードが読み込まれました:", len(jan_df))
-                jan_df.index = jan_df.index + 1
-                height = min(len(jan_df) * 35 + 38, 800)
-                st.dataframe(jan_df, use_container_width=True, height=height, key="jancode_update")
+            jan_df = pd.read_csv(uploaded_file)
+            st.write("JANコードが読み込まれました:", len(jan_df))
+            jan_df.index = jan_df.index + 1
+            height = min(len(jan_df) * 35 + 38, 800)
+            st.dataframe(jan_df, use_container_width=True, height=height, key="jancode_update")
 
-                # Save to config.JANCODE_SCV
-                jan_df.to_csv(config.JANCODE_SCV, index=False)
-                st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
-            except Exception as e:
-                st.error(f"エラーが発生しました: {str(e)}")
+            jan_df.to_csv(config.JANCODE_SCV, index=False)
+            st.success(f"JANコードが保存されました {config.JANCODE_SCV}")
         else:
-            self.load_existing_jan_data()
-
-    def load_existing_jan_data(self):
-        """Load existing JAN data if the file is found"""
-        try:
-            df = pd.read_csv(config.JANCODE_SCV)
-            df.index = df.index + 1
-            height = min(len(df) * 35 + 38, 800)
-            st.dataframe(df, use_container_width=True, height=height, key="jancode_original")
-        except FileNotFoundError:
-            st.warning("JANコードデータはまだ利用できません。")
+            try:
+                df = pd.read_csv(config.JANCODE_SCV)
+                df.index = df.index + 1
+                height = min(len(df) * 35 + 38, 800)
+                st.dataframe(df, use_container_width=True, height=height, key="jancode_original")
+            except FileNotFoundError:
+                st.warning("JANコードデータはまだ利用できません。")
 
     def _setup_scraping_controls(self):
-        """Setup scraping control buttons"""
         st.subheader("スクレイピング制御")
         if self.running():
             st.sidebar.button("停 止", type="primary", use_container_width=True, on_click=self.stop_running)
@@ -137,23 +137,19 @@ class PriceScraperUI:
             st.sidebar.button("開 始", type="secondary", use_container_width=True, on_click=self.start_running)
 
     def running(self):
-        """Check if scraping is running"""
         return os.path.exists(config.RUNNING)
 
     def start_running(self):
-        """Start scraping operation"""
         if not self.running():
             os.makedirs(os.path.dirname(config.RUNNING), exist_ok=True)
         with open(config.RUNNING, 'w') as file:
             file.write('1')
 
     def stop_running(self):
-        """Stop scraping operation"""
         file_path = Path(config.RUNNING)
         file_path.unlink()
 
     def display_main_content(self):
-        """Display main scraping results"""
         try:
             df = pd.read_excel(config.OUTPUT_XLSX)
             if "Yahoo! Link" in df.columns:
@@ -167,7 +163,6 @@ class PriceScraperUI:
             st.warning("スクレイピングされたデータはまだない。")
 
     def download_excel(self):
-        """Download the scraped Excel file"""
         try:
             df = pd.read_excel(config.OUTPUT_XLSX)
             if "Yahoo! Link" in df.columns:
@@ -191,19 +186,18 @@ class PriceScraperUI:
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
+    
     def logout(self):
-        """Logout the user"""
         session = get_session_id()
         config.LOGIN_STATE[session] = False
         config.CURRENT_USER = None
-        st.experimental_rerun()  # Re-run to clear the session
+        st.rerun()
 
     def run(self):
-        """Main method to control the app flow"""
         session = get_session_id()
         if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
             self.setup_sidebar()
-            tab1, tab2 = st.tabs(["スクレイプ価格", "JANコードデータ"])
+            tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
                 self.display_main_content()
             with tab2:
