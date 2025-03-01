@@ -35,6 +35,8 @@ class PriceScraper:
             yahoo_product = yahoo_future.result()
             rakuten_price = rakuten_future.result()
 
+            print(yahoo_product)
+
         # Handle Yahoo product price and URL, default to None if not available
         if yahoo_product != "N/A":
             yahoo_price = yahoo_product.get("price", None)
