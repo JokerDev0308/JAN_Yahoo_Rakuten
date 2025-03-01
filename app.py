@@ -25,6 +25,7 @@ def authenticate(username: str, password: str) -> bool:
 
 # JavaScript to get cookie value
 get_cookie_js = """
+<input type="hidden" id="cookieInput">
 <script>
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -33,15 +34,14 @@ function getCookie(name) {
 let cookieValue = getCookie("ajs_anonymous_id");  
 console.log(cookieValue)
 if (cookieValue) {
-    let streamlitDoc = window.parent.document;
-    let streamlitInput = streamlitDoc.getElementById("cookieInput");
+    let streamlitInput = document.getElementById("cookieInput");
     if (streamlitInput) {
         streamlitInput.value = cookieValue;
         streamlitInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
 }
 </script>
-<input type="hidden" id="cookieInput">
+
 """
 
 # Display JavaScript in Streamlit
