@@ -156,37 +156,17 @@ class PriceScraperUI:
 
     def display_main_content(self):
         try:
-            # Read the Excel file into a DataFrame
             df = pd.read_excel(config.OUTPUT_XLSX)
-            
-            # If the "Yahoo! Link" column exists, drop it
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
             
-            # Rename columns based on the mapping and reorder columns
             df = df.rename(columns=column_name_mapping)[ordered_columns]
             
-            # Apply hyperlinks to the '対象リンク（Y!と楽の安い方）' column
-            df['対象リンク（Y!と楽の安い方）'] = df['対象リンク（Y!と楽の安い方）'].apply(
-                lambda x: f'<a href="{x}" target="_blank">{x}</a>' if pd.notna(x) else ''
-            )
-            
-            # Create the Markdown table with hyperlinks
-            markdown_table = df.to_markdown(index=False, tablefmt="pipe")
-            
-            # Display the table as markdown, which will render HTML hyperlinks
-            st.markdown(markdown_table, unsafe_allow_html=True)
-            
-            # Adjust index and set table height based on the number of rows
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
-            
-            # Display the dataframe in Streamlit with proper scroll handling
             st.dataframe(df, use_container_width=True, height=height, key="result")
-        
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
-
 
     def download_excel(self):
         try:
