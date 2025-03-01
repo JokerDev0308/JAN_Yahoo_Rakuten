@@ -23,41 +23,6 @@ def authenticate(username: str, password: str) -> bool:
 #     cookie_value = params.get("X", [""])[0]  
 #     return cookie_value
 
-# JavaScript to get cookie value
-get_cookie_js = """
-<input type="text" id="cookieInput">
-<script>
-function getCookie(name) {
-    let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? match[2] : null;
-}
-let cookieValue = getCookie("ajs_anonymous_id");  
-console.log(cookieValue)
-if (cookieValue) {
-    let streamlitInput = document.getElementById("cookieInput");
-    if (streamlitInput) {
-        streamlitInput.value = cookieValue;
-        streamlitInput.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-}
-console.log(document.getElementById("cookieInput").value)
-</script>
-
-"""
-
-# Display JavaScript in Streamlit
-st.components.v1.html(get_cookie_js, height=0)
-
-# Create a text input (hidden) to capture the cookie value
-cookie_value = st.text_input("Hidden Cookie Input", key="cookieInput", label_visibility="hidden")
-
-# Store in session state
-if cookie_value and "cookie_X" not in st.session_state:
-    st.session_state["cookie_X"] = cookie_value
-
-# Display the retrieved cookie
-st.write("Retrieved Cookie X:", st.session_state.get("cookie_X", "Not Found"))
-
 # Set Streamlit page configuration
 st.set_page_config(
     page_title="JANコード価格スクレーパーモニター",
@@ -235,7 +200,6 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
-        st.write(get_or_set_uid())
         #session = get_session_id()
         # if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
         if st.session_state.logged_in:
