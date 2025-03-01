@@ -25,9 +25,9 @@ def authenticate(username: str, password: str) -> bool:
 
 def get_or_set_uid():
     # Read cookies from HTTP headers
-    cookie_string = st.request.headers.get("cookie", "")
+    # cookie_string = st.request.headers.get("cookie", "")
     cookies = SimpleCookie()
-    cookies.load(cookie_string)
+    # cookies.load(cookie_string)
     return cookies
 
 # Set Streamlit page configuration
