@@ -29,13 +29,34 @@ class PriceScraper:
         self.batch_size = 10  # Configurable batch size for saving
 
     def load_data(self) -> None:
-        """Load JAN codes and prices from CSV file"""
-        jan_df = pd.read_csv(config.JANCODE_SCV)
-        out_df = pd.read_excel(config.OUTPUT_XLSX)
+        """Load JAN codes and prices from CSV file and update the output DataFrame if necessary."""
+        
+        try:
+            # Read the CSV and Excel files
+            jan_df = pd.read_csv(config.JANCODE_SCV)
+            out_df = pd.read_excel(config.OUTPUT_XLSX)
 
-        # Ensure the JAN columns match in both dataframes
-        if jan_df["JAN"].equals(out_df["JAN"]):
-            self.df = out_df
+            # Ensure 'JAN' and 'price' columns exist in both dataframes
+            if 'JAN' not in jan_df.columns or 'price' not in jan_df.columns:
+                print("CSV file is missing required 'JAN' or 'price' columns.")
+                return
+            
+            if 'JAN' not in out_df.columns or 'price' not in out_df.columns:
+                print("Excel file is missing required 'JAN' or 'price' columns.")
+                return
+
+            # Ensure the JAN columns match in both dataframes
+            if jan_df["JAN"].equals(out_df["JAN"]):
+                if not jan_df["price"].equals(out_df["price"]):
+                    out_df["price"] = jan_df["price"]
+                self.df = out_df
+            else:
+                self.df = jan_df
+
+        except FileNotFoundError as e:
+            print(f"File not found: {str(e)}")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
 
 
 
