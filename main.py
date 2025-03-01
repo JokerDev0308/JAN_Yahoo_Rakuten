@@ -63,8 +63,8 @@ class PriceScraper:
             min_price = rakuten_price
 
         # Ensure 'row['price']' is a valid number before subtraction
-        if isinstance(row['price'], (int, float)):
-            price_diff = float(row['price']) - min_price
+        # if isinstance(row['price'], (int, float)):
+        price_diff = float(row['price']) - float(min_price)
 
         return {
             'Yahoo Price': yahoo_price,
