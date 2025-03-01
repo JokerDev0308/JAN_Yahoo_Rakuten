@@ -12,15 +12,15 @@ session_manager = SessionManager()
 def authenticate(username: str, password: str) -> bool:
     if session_manager.validate_user(username, password):
         config.CURRENT_USER = username
-        session = get_session_id()
-        config.LOGIN_STATE[session] = True
+        # session = get_session_id()
+        # config.LOGIN_STATE[session] = True
         return True
     return False
 
-def get_session_id():
-    params = st.query_params()
-    cookie_value = params.get("X", [""])[0]  
-    return cookie_value
+# def get_session_id():
+#     params = st.query_params()
+#     cookie_value = params.get("X", [""])[0]  
+#     return cookie_value
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -192,9 +192,9 @@ class PriceScraperUI:
 
     
     def logout(self):
-        session = get_session_id()
+        # session = get_session_id()
         st.session_state.logged_in = False
-        config.LOGIN_STATE[session] = False
+        # config.LOGIN_STATE[session] = False
         config.CURRENT_USER = None
         st.rerun()
 
