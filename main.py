@@ -38,6 +38,8 @@ class PriceScraper:
     
     def process_product(self, row):
         jan, saved_url = row['JAN'], row.get('Yahoo! Link')
+
+        print(jan)
         
         with ThreadPoolExecutor(max_workers=2) as executor:
             futures = {
@@ -94,6 +96,7 @@ class PriceScraper:
                 
                 self.save_results()
                 self.save_yahoo_urls()
+
                 sleep(self.rate_limit)
         finally:
             print("Scraping completed.")
