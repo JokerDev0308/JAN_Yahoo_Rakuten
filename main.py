@@ -69,7 +69,10 @@ class PriceScraper:
         
         try:
             total_records = len(self.df)
+           
             for i in range(0, total_records, self.batch_size):
+                print(f"process: {i} / {total_records}")
+
                 if not self.running():
                     print("Scraping stopped.")
                     return
