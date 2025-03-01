@@ -18,7 +18,7 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_session_id():
-    params = st.experimental_get_query_params()
+    params = st.query_params()
     cookie_value = params.get("X", [""])[0]  
     return cookie_value
 
