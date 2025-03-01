@@ -40,6 +40,7 @@ if (cookieValue) {
         streamlitInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
 }
+console.log(document.getElementById("cookieInput").value)
 </script>
 
 """
