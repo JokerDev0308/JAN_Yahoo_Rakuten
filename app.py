@@ -25,7 +25,7 @@ def authenticate(username: str, password: str) -> bool:
 
 # JavaScript to get cookie value
 get_cookie_js = """
-<input type="hidden" id="cookieInput">
+<input type="text" id="cookieInput">
 <script>
 function getCookie(name) {
     let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
