@@ -161,10 +161,20 @@ class PriceScraperUI:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
             
             df = df.rename(columns=column_name_mapping)[ordered_columns]
+
+            df['対象リンク（Y!と楽の安い方）'] = df['対象リンク（Y!と楽の安い方）'].apply(
+                        lambda x: f'<a href="{x}" target="_blank">{x}</a>' if pd.notna(x) else ''
+                    )
             
+
+            # Create Markdown table with hyperlinks
+            markdown_table = df.to_markdown(index=False, tablefmt="pipe")
+            
+            # Display the table as markdown (which will render HTML hyperlinks)
+            st.markdown(markdown_table, unsafe_allow_html=True)
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
-            st.dataframe(df, use_container_width=True, height=height, key="result")
+            st.table(df, use_container_width=True, height=height, key="result")
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
