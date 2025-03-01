@@ -18,8 +18,10 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_session_id():
-    cookie_value = "Admin"
-    return cookie_value
+    try:
+        return st.request.cookies.get("ajs_anonymous_id")
+    except AttributeError:
+        return None
 
 # Set Streamlit page configuration
 st.set_page_config(
@@ -94,19 +96,19 @@ class PriceScraperUI:
                     """
                 , unsafe_allow_html=True)
                 
-                st.subheader("Login")
+                st.subheader("ログイン")
 
-                username = st.text_input("Username")
-                password = st.text_input("Password", type="password")
+                username = st.text_input("ユーザー名")
+                password = st.text_input("パスワード", type="password")
                 
-                login_button = st.button("Login")
+                login_button = st.button("ログイン")
                 if login_button:
                     if authenticate(username, password):
                         st.session_state.logged_in = True
-                        st.success("Login successful!")
+                        st.success("ログインに成功しました!")
                         st.rerun()
                     else:
-                        st.error("Invalid username or password.")
+                        st.error("ユーザー名またはパスワードが無効です。")
 
 
     def _handle_file_upload(self):
@@ -195,6 +197,7 @@ class PriceScraperUI:
 
     def run(self):
         session = get_session_id()
+        st.write(session)
         if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
             self.setup_sidebar()
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
