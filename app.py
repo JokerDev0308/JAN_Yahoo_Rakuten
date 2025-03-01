@@ -18,10 +18,9 @@ def authenticate(username: str, password: str) -> bool:
     return False
 
 def get_session_id():
-    try:
-        return st.request.cookies.get("ajs_anonymous_id")
-    except AttributeError:
-        return None
+    params = st.experimental_get_query_params()
+    cookie_value = params.get("X", [""])[0]  
+    return cookie_value
 
 # Set Streamlit page configuration
 st.set_page_config(
