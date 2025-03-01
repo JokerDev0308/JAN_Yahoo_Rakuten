@@ -159,8 +159,13 @@ class PriceScraperUI:
             df = pd.read_excel(config.OUTPUT_XLSX)
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
-
+            
             df = df.rename(columns=column_name_mapping)[ordered_columns]
+
+            df['対象リンク（Y!と楽の安い方）'] = df['対象リンク（Y!と楽の安い方）'].apply(
+                        lambda x: f'<a href="{x}" target="_blank">{x}</a>' if pd.notna(x) else ''
+                    )
+            
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
             st.dataframe(df, use_container_width=True, height=height, key="result")
