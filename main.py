@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 import os
 import re
@@ -19,6 +19,7 @@ class PriceScraper:
         self.rakuten_scraper = RakutenScraper()
         self.batch_size = batch_size
         self.rate_limit = rate_limit  # Control request pacing
+        self.load_data()
 
     def load_data(self):
         try:
@@ -26,14 +27,8 @@ class PriceScraper:
             out_df = pd.read_excel(config.OUTPUT_XLSX)
             
             if {'JAN', 'price'}.issubset(jan_df.columns) and {'JAN', 'price'}.issubset(out_df.columns):
-                if not jan_df["price"].equals(out_df["price"]):
-                    out_df["price"] = jan_df["price"]
-                
-                    # Assign the updated dataframe to self.df
-                    self.df = out_df
-                    print("Data loaded and updated successfully.")
-                else:
-                    self.df = jan_df
+                out_df.update(jan_df)  # Update existing prices from CSV
+                self.df = out_df
             else:
                 self.df = jan_df
         except FileNotFoundError as e:
@@ -45,13 +40,22 @@ class PriceScraper:
         jan, saved_url = row['JAN'], row.get('Yahoo! Link')
         
         with ThreadPoolExecutor(max_workers=2) as executor:
-            yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan, saved_url)
-            rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
+            futures = {
+                executor.submit(self.yahoo_scraper.scrape_price, jan, saved_url): 'yahoo',
+                executor.submit(self.rakuten_scraper.scrape_price, jan): 'rakuten'
+            }
             
-            yahoo_product = yahoo_future.result()
-            rakuten_price = clean_price(rakuten_future.result())
+            results = {source: None for source in ['yahoo', 'rakuten']}
+            for future in as_completed(futures):
+                source = futures[future]
+                try:
+                    results[source] = future.result()
+                except Exception as e:
+                    print(f"Error scraping {source} for {jan}: {e}")
+                    results[source] = "N/A"
         
-        yahoo_price, yahoo_url = (clean_price(yahoo_product.get("price", "0")), yahoo_product.get("url", "N/A")) if yahoo_product != "N/A" else ("N/A", "N/A")
+        yahoo_price, yahoo_url = (clean_price(results['yahoo'].get("price", "0")), results['yahoo'].get("url", "N/A")) if results['yahoo'] != "N/A" else ("N/A", "N/A")
+        rakuten_price = clean_price(results['rakuten']) if results['rakuten'] != "N/A" else "N/A"
         rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?s=11&used=0"
         
         min_price, min_price_url = (min(yahoo_price, rakuten_price), yahoo_url if yahoo_price <= rakuten_price else rakuten_url) if yahoo_price != "N/A" and rakuten_price != "N/A" else (yahoo_price if yahoo_price != "N/A" else rakuten_price, yahoo_url if yahoo_price != "N/A" else rakuten_url)
@@ -69,20 +73,24 @@ class PriceScraper:
         
         try:
             total_records = len(self.df)
-           
-            for i in range(0, total_records, self.batch_size):
-                print(f"process: {i} / {total_records}")
-
+            batch_indices = range(0, total_records, self.batch_size)
+            
+            for i in batch_indices:
                 if not self.running():
                     print("Scraping stopped.")
                     return
                 
                 batch = self.df.iloc[i:i+self.batch_size]
-                with ThreadPoolExecutor() as executor:
-                    results = list(executor.map(self.process_product, [row for _, row in batch.iterrows()]))
                 
-                for j, result in enumerate(results):
-                    self.df.loc[i+j, result.keys()] = result.values()
+                with ThreadPoolExecutor() as executor:
+                    future_to_index = {executor.submit(self.process_product, row): idx for idx, row in batch.iterrows()}
+                    
+                    for future in as_completed(future_to_index):
+                        index = future_to_index[future]
+                        try:
+                            self.df.loc[index, future.result().keys()] = future.result().values()
+                        except Exception as e:
+                            print(f"Error updating row {index}: {e}")
                 
                 self.save_results()
                 self.save_yahoo_urls()
@@ -107,7 +115,6 @@ def main():
     try:
         while True:
             scraper = PriceScraper()
-            scraper.load_data()
             scraper.scrape_running()
             sleep(5)
     except KeyboardInterrupt:
