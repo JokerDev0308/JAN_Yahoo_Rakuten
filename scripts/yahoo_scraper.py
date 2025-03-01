@@ -22,7 +22,7 @@ class YahooScraper:
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
                 )
 
-                if not items:
+                if not items or len(items) == 0:
                     return "N/A"
 
                 product['url'] = items[0].get_attribute('href')
