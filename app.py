@@ -199,6 +199,7 @@ class PriceScraperUI:
         st.rerun()
 
     def run(self):
+        st.write(st.experimental_user)
         #session = get_session_id()
         # if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
         if st.session_state.logged_in:
