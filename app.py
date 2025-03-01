@@ -56,6 +56,9 @@ class PriceScraperUI:
     def __init__(self):
         self.initialized = False
 
+        if 'logged_in' not in st.session_state:
+            st.session_state['logged_in'] = False
+
     def setup_sidebar(self):
         with st.sidebar:
             st.subheader("メニュー")
@@ -190,14 +193,15 @@ class PriceScraperUI:
     
     def logout(self):
         session = get_session_id()
+        st.session_state.logged_in = False
         config.LOGIN_STATE[session] = False
         config.CURRENT_USER = None
         st.rerun()
 
     def run(self):
-        session = get_session_id()
-        st.write(session)
-        if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
+        #session = get_session_id()
+        # if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
+        if st.session_state.logged_in:
             self.setup_sidebar()
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
