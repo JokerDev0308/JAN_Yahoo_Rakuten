@@ -1,69 +1,48 @@
 import pandas as pd
 from datetime import datetime
-from webdriver_manager import WebDriverManager
-from scripts.yahoo_scraper import YahooScraper
-from scripts.rakuten_scraper import RakutenScraper
-import config 
-import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
-from typing import Optional, Dict, Any
-import numpy as np
+import os
 import re
+from scripts.yahoo_scraper import YahooScraper
+from scripts.rakuten_scraper import RakutenScraper
+import config
 
 def clean_price(price_str):
-    # Remove non-numeric characters, keeping only digits and period (.)
-    cleaned_price = re.sub(r'[^\d.]', '', price_str)
-    
-    # If the cleaned string is empty, return a default value (e.g., 0)
-    if cleaned_price == "":
-        return 0.0
-    
-    return float(cleaned_price)
+    cleaned_price = re.sub(r'[^\d.]', '', str(price_str))
+    return float(cleaned_price) if cleaned_price else 0.0
 
 class PriceScraper:
-    def __init__(self):
-        self.df: Optional[pd.DataFrame] = None
+    def __init__(self, batch_size=10, rate_limit=1):
+        self.df = None
         self.yahoo_scraper = YahooScraper()
         self.rakuten_scraper = RakutenScraper()
-        self.batch_size = 10  # Configurable batch size for saving
+        self.batch_size = batch_size
+        self.rate_limit = rate_limit  # Control request pacing
 
-    def load_data(self) -> None:
-        """Load JAN codes and prices from CSV file and update the output DataFrame if necessary."""
-        
+    def load_data(self):
         try:
-            # Read the CSV and Excel files
             jan_df = pd.read_csv(config.JANCODE_SCV)
             out_df = pd.read_excel(config.OUTPUT_XLSX)
-
-            # Ensure 'JAN' and 'price' columns exist in both dataframes
-            if 'JAN' not in jan_df.columns or 'price' not in jan_df.columns:
-                print("CSV file is missing required 'JAN' or 'price' columns.")
-                return
             
-            if 'JAN' not in out_df.columns or 'price' not in out_df.columns:
-                print("Excel file is missing required 'JAN' or 'price' columns.")
-                return
-
-            # Ensure the JAN columns match in both dataframes
-            if jan_df["JAN"].equals(out_df["JAN"]):
+            if {'JAN', 'price'}.issubset(jan_df.columns) and {'JAN', 'price'}.issubset(out_df.columns):
                 if not jan_df["price"].equals(out_df["price"]):
                     out_df["price"] = jan_df["price"]
-                self.df = out_df
+                
+                    # Assign the updated dataframe to self.df
+                    self.df = out_df
+                    print("Data loaded and updated successfully.")
+                else:
+                    self.df = jan_df
             else:
                 self.df = jan_df
-
         except FileNotFoundError as e:
-            print(f"File not found: {str(e)}")
+            print(f"File not found: {e}")
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-
-
-    def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
-        """Process a single product and return results"""
-        jan = row['JAN']
-        saved_url = row.get('Yahoo! Link')
+            print(f"Error loading data: {e}")
+    
+    def process_product(self, row):
+        jan, saved_url = row['JAN'], row.get('Yahoo! Link')
         
         with ThreadPoolExecutor(max_workers=2) as executor:
             yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan, saved_url)
@@ -71,95 +50,54 @@ class PriceScraper:
             
             yahoo_product = yahoo_future.result()
             rakuten_price = clean_price(rakuten_future.result())
-
-        # Handle Yahoo product price and URL, default to None if not available
-        if yahoo_product != "N/A":
-            yahoo_price = clean_price(yahoo_product.get("price", "N/A"))
-            yahoo_url = yahoo_product.get("url", "N/A")
-        else:
-            yahoo_price = "N/A"
-            yahoo_url = "N/A"
-
-        # Rakuten URL generation
-        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0"
-
-        # Initialize default values
-        min_price_url = "N/A"
-        price_diff = "N/A"
-
-        # Determine minimum price and price difference
-        if yahoo_price != "N/A" and rakuten_price != "N/A":
-            min_price = min(float(yahoo_price), float(rakuten_price))
-            min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
-            
-        elif yahoo_price != "N/A":
-            min_price_url = yahoo_url
-            min_price = yahoo_price
-        elif rakuten_price != "N/A":
-            min_price_url = rakuten_url
-            min_price = rakuten_price
-
-        # Ensure 'row['price']' is a valid number before subtraction
-        # if isinstance(row['price'], (int, float)):
-        price_diff = float(row['price']) - float(min_price)
-
+        
+        yahoo_price, yahoo_url = (clean_price(yahoo_product.get("price", "0")), yahoo_product.get("url", "N/A")) if yahoo_product != "N/A" else ("N/A", "N/A")
+        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?s=11&used=0"
+        
+        min_price, min_price_url = (min(yahoo_price, rakuten_price), yahoo_url if yahoo_price <= rakuten_price else rakuten_url) if yahoo_price != "N/A" and rakuten_price != "N/A" else (yahoo_price if yahoo_price != "N/A" else rakuten_price, yahoo_url if yahoo_price != "N/A" else rakuten_url)
+        price_diff = float(row['price']) - min_price if isinstance(row['price'], (int, float)) else "N/A"
+        
         return {
-            'Yahoo Price': yahoo_price,
-            'Yahoo! Link': yahoo_url,
-            'Rakuten Price': rakuten_price,
-            'Min Price URL': min_price_url,
-            'Price Difference': price_diff,
-            'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'Yahoo Price': yahoo_price, 'Yahoo! Link': yahoo_url,
+            'Rakuten Price': rakuten_price, 'Min Price URL': min_price_url,
+            'Price Difference': price_diff, 'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
-
-
-
-    def scrape_running(self) -> None:
-        """Main scraping loop with optimized batch processing"""
+    
+    def scrape_running(self):
         if self.df is None or self.df.empty:
             return
-
+        
         try:
             total_records = len(self.df)
-            for index, row in self.df.iterrows():
+            for i in range(0, total_records, self.batch_size):
                 if not self.running():
-                    print("Running was stopped")
+                    print("Scraping stopped.")
                     return
-
-                print(f"Processing {index + 1}/{total_records}: JAN {row['JAN']}")
                 
-                # Process single product
-                results = self.process_product(index, row)
+                batch = self.df.iloc[i:i+self.batch_size]
+                with ThreadPoolExecutor() as executor:
+                    results = list(executor.map(self.process_product, [row for _, row in batch.iterrows()]))
                 
-                # Update DataFrame
-                for key, value in results.items():
-                    self.df.at[index, key] = value
-
-                # Save results in batches
-                if (index + 1) % self.batch_size == 0 or (index + 1) == total_records:
-                    self.save_results()
-                    self.save_yahoo_urls()
-
-                sleep(1)  # Rate limiting
+                for j, result in enumerate(results):
+                    self.df.loc[i+j, result.keys()] = result.values()
                 
+                self.save_results()
+                self.save_yahoo_urls()
+                sleep(self.rate_limit)
         finally:
-            WebDriverManager.close_all()
-
-    def save_results(self) -> None:
-        """Save results to Excel file"""
+            print("Scraping completed.")
+    
+    def save_results(self):
         os.makedirs(os.path.dirname(config.OUTPUT_XLSX), exist_ok=True)
         self.df.to_excel(config.OUTPUT_XLSX, index=False)
-        print(f"Progress saved to {config.OUTPUT_XLSX}")
-
-    def save_yahoo_urls(self) -> None:
-        """Save JANs and their corresponding Yahoo URLs"""
-        urls_df = self.df[['JAN', 'price', 'Yahoo! Link']].copy()
-        urls_df.to_csv(config.JANCODE_SCV, index=False)
-        print(f"URLs saved to {config.JANCODE_SCV}")
-
+        print(f"Saved progress to {config.OUTPUT_XLSX}")
+    
+    def save_yahoo_urls(self):
+        self.df[['JAN', 'price', 'Yahoo! Link']].to_csv(config.JANCODE_SCV, index=False)
+        print(f"Saved Yahoo URLs to {config.JANCODE_SCV}")
+    
     @staticmethod
-    def running() -> bool:
-        """Check if scraping should continue"""
+    def running():
         return os.path.exists(config.RUNNING)
 
 def main():
@@ -170,7 +108,7 @@ def main():
             scraper.scrape_running()
             sleep(5)
     except KeyboardInterrupt:
-        WebDriverManager.close_all()
+        print("Terminating scraper.")
 
 if __name__ == "__main__":
     main()
