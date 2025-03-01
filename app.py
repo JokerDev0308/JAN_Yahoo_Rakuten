@@ -23,12 +23,38 @@ def authenticate(username: str, password: str) -> bool:
 #     cookie_value = params.get("X", [""])[0]  
 #     return cookie_value
 
-def get_or_set_uid():
-    # Read cookies from HTTP headers
-    # cookie_string = st.request.headers.get("cookie", "")
-    cookies = SimpleCookie()
-    # cookies.load(cookie_string)
-    return cookies
+# JavaScript to get cookie value
+get_cookie_js = """
+<script>
+function getCookie(name) {
+    let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+let cookieValue = getCookie("ajs_anonymous_id");  
+if (cookieValue) {
+    let streamlitDoc = window.parent.document;
+    let streamlitInput = streamlitDoc.getElementById("cookieInput");
+    if (streamlitInput) {
+        streamlitInput.value = cookieValue;
+        streamlitInput.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+}
+</script>
+<input type="hidden" id="cookieInput">
+"""
+
+# Display JavaScript in Streamlit
+st.components.v1.html(get_cookie_js, height=0)
+
+# Create a text input (hidden) to capture the cookie value
+cookie_value = st.text_input("Hidden Cookie Input", key="cookieInput", label_visibility="hidden")
+
+# Store in session state
+if cookie_value and "cookie_X" not in st.session_state:
+    st.session_state["cookie_X"] = cookie_value
+
+# Display the retrieved cookie
+st.write("Retrieved Cookie X:", st.session_state.get("cookie_X", "Not Found"))
 
 # Set Streamlit page configuration
 st.set_page_config(
