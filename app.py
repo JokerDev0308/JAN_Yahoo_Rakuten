@@ -157,26 +157,45 @@ class PriceScraperUI:
     def display_main_content(self):
         try:
             df = pd.read_excel(config.OUTPUT_XLSX)
+            
+            # Drop 'Yahoo! Link' if it exists
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
             
-            df = df.rename(columns=column_name_mapping)[ordered_columns]
-
-            df['対象リンク（Y!と楽の安い方）'] = df['対象リンク（Y!と楽の安い方）'].apply(
-                        lambda x: f'<a href="{x}" target="_blank">{x}</a>' if pd.notna(x) else ''
-                    )
+            # Check if all expected columns for renaming are present
+            missing_columns = [col for col in column_name_mapping.keys() if col not in df.columns]
+            if missing_columns:
+                raise ValueError(f"Missing columns for renaming: {', '.join(missing_columns)}")
             
-
+            # Rename columns and reorder
+            df = df.rename(columns=column_name_mapping)[ordered_columns]
+            
+            # Ensure '対象リンク（Y!と楽の安い方）' exists for hyperlink creation
+            if '対象リンク（Y!と楽の安い方）' in df.columns:
+                df['対象リンク（Y!と楽の安い方）'] = df['対象リンク（Y!と楽の安い方）'].apply(
+                    lambda x: f'<a href="{x}" target="_blank">{x}</a>' if pd.notna(x) else ''
+                )
+            else:
+                raise ValueError("'対象リンク（Y!と楽の安い方）' column is missing.")
+            
             # Create Markdown table with hyperlinks
             markdown_table = df.to_markdown(index=False, tablefmt="pipe")
             
             # Display the table as markdown (which will render HTML hyperlinks)
             st.markdown(markdown_table, unsafe_allow_html=True)
+            
+            # Adjust index and display table with dynamic height
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
             st.table(df, use_container_width=True, height=height, key="result")
+        
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
+        except ValueError as ve:
+            st.error(str(ve))
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {str(e)}")
+
 
     def download_excel(self):
         try:
