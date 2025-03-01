@@ -31,6 +31,7 @@ function getCookie(name) {
     return match ? match[2] : null;
 }
 let cookieValue = getCookie("ajs_anonymous_id");  
+console.log(cookieValue)
 if (cookieValue) {
     let streamlitDoc = window.parent.document;
     let streamlitInput = streamlitDoc.getElementById("cookieInput");
