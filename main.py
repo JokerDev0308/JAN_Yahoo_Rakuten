@@ -35,14 +35,12 @@ class PriceScraper:
             yahoo_product = yahoo_future.result()
             rakuten_price = rakuten_future.result()
 
-            print(yahoo_product)
-
         # Handle Yahoo product price and URL, default to None if not available
         if yahoo_product != "N/A":
-            yahoo_price = yahoo_product.get("price", None)
+            yahoo_price = yahoo_product.get("price", "N/A")
             yahoo_url = yahoo_product.get("url", "N/A")
         else:
-            yahoo_price = None
+            yahoo_price = "N/A"
             yahoo_url = "N/A"
 
         # Rakuten URL generation
@@ -50,14 +48,14 @@ class PriceScraper:
 
         # Initialize default values
         min_price_url = "N/A"
-        price_diff = None
+        price_diff = "N/A"
 
         # Determine minimum price and price difference
-        if yahoo_price != None and rakuten_price != "N/A":
+        if yahoo_price != "N/A" and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
             min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
             
-        elif yahoo_price != None:
+        elif yahoo_price != "N/A":
             min_price_url = yahoo_url
             min_price = yahoo_price
         elif rakuten_price != "N/A":

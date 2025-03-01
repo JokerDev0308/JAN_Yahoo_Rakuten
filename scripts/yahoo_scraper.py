@@ -28,7 +28,6 @@ class YahooScraper:
 
                 product['url'] = items[0].get_attribute('href')
 
-                print("===", product['url'])
                 if not product['url']:
                     return "N/A"
 
