@@ -33,10 +33,7 @@ class RakutenScraper:
             if filter_button.get_attribute('value') == '0':
                 self.driver.execute_script("arguments[0].click();", filter_button)
 
-                # Optionally, wait for the checkbox to change its state (checked or unchecked)
-                WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.attribute_to_be(filter_button, 'value', '2')  # Wait for the value to change
-                )
+                sleep(1)
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
