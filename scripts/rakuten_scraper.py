@@ -1,54 +1,63 @@
-import requests
-from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
-import logging
+from webdriver_manager import WebDriverManager
+from time import sleep
 
+import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class RakutenScraper:
     def __init__(self):
-        # URL for form submission
-        self.base_url = "https://search.rakuten.co.jp/search/mall"
+        self.driver = WebDriverManager.get_driver("rakuten")
 
     def scrape_price(self, jan_code):
         try:
-            # Data from the form, including the JAN code and other parameters
-            form_data = {
-                "sitem": jan_code,  # JAN code
-                "p": "1",  # Page number
-                "s": "11",  # Sorting order
-                "used": "0",  # Used items filter
-                "set": "priceDisplay",  # Price display setting
-                "_mp": '{"display_options:price":2,"pricedisplay":0}',  # Display options in the form
-                "pd": "0"  # Assuming the checkbox is checked (if you need it unchecked, set pd to 1)
-            }
 
-            # Send the GET request with form data
-            response = requests.get(self.base_url, params=form_data, timeout=10)
+            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}")
 
-           
+            # Locate the form element using the CSS selector for the form
+            form = self.driver.find_element(By.CSS_SELECTOR, ".final-price-form--3Ko_l")
 
-            # If the request was successful, process the response
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, 'html.parser')
+            # Locate the JAN code input field (sitem) within the form
+            jan_input = form.find_element(By.NAME, "sitem")
+            p = form.find_element(By.NAME, "p")
+            s = form.find_element(By.NAME, "s")
+            used = form.find_element(By.NAME, "used")
+            set = form.find_element(By.NAME, "set")
+            _mp = form.find_element(By.NAME, "_mp")
 
-                print("===========================")
-                print(soup)
-                print("===========================")
+            # Clear any existing value in the JAN code field
+            jan_input.clear()
 
-                # Look for the price element (similar to the original scraping logic)
-                items = soup.select(".final-price")
+            # Set the value of the JAN code input field to the provided JAN code
+            jan_input.send_keys(jan_code)
+            p.send_keys(1)
+            s.send_keys(11)
+            used.send_keys(0)
+            set.send_keys('priceDisplay')
+            _mp.send_keys("{'display_options:price':0,'pricedisplay':2}")
 
-                print(items)
 
-                # If price elements are found, extract the first one
-                if items:
-                    price = items[0].get_text(strip=True).translate(str.maketrans("", "", "円,"))
-                    print(price)
-                    return price
+            # Submit the form
+            form.submit()  # This simulates the user submitting the form
 
+            # Wait for the search results to load after form submission
+            WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".searchresultitem"))
+            )
+            # Once the results are loaded, find the price elements
+            items = self.driver.find_elements(By.CSS_SELECTOR, ".searchresultitem")
+            price_elements = items[0].find_elements(By.CSS_SELECTOR, ".final-price") 
+            if price_elements:
+                # Extract the price and clean it up (e.g., remove '円' and commas)
+                price = price_elements[0].text.translate(str.maketrans("", "", "円,"))
+                print(price)
+                return price
+            
             return "N/A"
 
         except Exception as e:
@@ -58,5 +67,4 @@ class RakutenScraper:
 
 
     def close(self):
-        # No need to close a request session as there is no persistent connection
-        pass
+        pass  
