@@ -433,7 +433,7 @@ class PriceScraper:
             yahoo_url = "N/A"
 
         # Rakuten URL generation
-        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?ran=1001000{jan}&s=11&used=0"
+        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?s=11&used=0"
 
         # Initialize default values
         min_price_url = "N/A"

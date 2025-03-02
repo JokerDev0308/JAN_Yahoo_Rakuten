@@ -10,7 +10,7 @@ class RakutenScraper:
 
     def scrape_price(self, jan_code):
         try:
-            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?ran=1001000{jan_code}&s=11&used=0")
+            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
             
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price--3zUvK"))
