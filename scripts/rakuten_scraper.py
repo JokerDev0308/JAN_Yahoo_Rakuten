@@ -30,10 +30,8 @@ class RakutenScraper:
             )
 
             # Check if the value is '0' (unchecked), and click if so
-            if filter_button.get_attribute('value') == '0':
-                self.driver.execute_script("arguments[0].click();", filter_button)
+            self.driver.execute_script("arguments[0].click();", filter_button)
 
-                sleep(1)
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
