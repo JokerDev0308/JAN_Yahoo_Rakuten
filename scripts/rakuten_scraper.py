@@ -17,8 +17,10 @@ class RakutenScraper:
             )
             
             if items:
-                return items[0].text.translate(str.maketrans("", "", "円,"))
-            
+                price = items[0].text.translate(str.maketrans("", "", "円,"))
+                print(price)
+                return price
+                        
             return "N/A"
 
         except Exception as e:

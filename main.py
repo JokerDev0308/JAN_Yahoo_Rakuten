@@ -369,7 +369,7 @@ def clean_price(price_str):
     
     # If the cleaned string is empty, return a default value (e.g., 0)
     if cleaned_price == "":
-        return 0.0
+        return "N/A"
     
     return float(cleaned_price)
 
@@ -440,8 +440,6 @@ class PriceScraper:
         price_diff = "N/A"
 
         # Determine minimum price and price difference
-        if (yahoo_price == "N/A" or yahoo_price == None or yahoo_price == 0.0) and (rakuten_price == "N/A" or rakuten_price == None or rakuten_price == 0.0):
-            return False
         
         if yahoo_price != "N/A" and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
@@ -453,6 +451,8 @@ class PriceScraper:
         elif rakuten_price != "N/A":
             min_price_url = rakuten_url
             min_price = rakuten_price
+        else:
+            return False
 
         # Ensure 'row['price']' is a valid number before subtraction
         # if isinstance(row['price'], (int, float)):
@@ -525,7 +525,7 @@ def main():
             scraper = PriceScraper()
             scraper.load_data()
             scraper.scrape_running()
-            sleep(5)
+            sleep(10)
     except KeyboardInterrupt:
         WebDriverManager.close_all()
 
