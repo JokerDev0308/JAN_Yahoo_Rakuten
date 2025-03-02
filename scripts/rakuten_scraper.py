@@ -17,27 +17,20 @@ class RakutenScraper:
     def scrape_price(self, jan_code):
         try:
 
-            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}")
+            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}?s=11&&used=0")
 
             # Locate the form element using the CSS selector for the form
             form = self.driver.find_element(By.CSS_SELECTOR, ".final-price-form--3Ko_l")
 
             # Locate the JAN code input field (sitem) within the form
-            jan_input = form.find_element(By.NAME, "sitem")
             p = form.find_element(By.NAME, "p")
-            s = form.find_element(By.NAME, "s")
-            used = form.find_element(By.NAME, "used")
             set = form.find_element(By.NAME, "set")
             _mp = form.find_element(By.NAME, "_mp")
 
             # Clear any existing value in the JAN code field
-            jan_input.clear()
 
             # Set the value of the JAN code input field to the provided JAN code
-            jan_input.send_keys(jan_code)
             p.send_keys(1)
-            s.send_keys(11)
-            used.send_keys(0)
             set.send_keys('priceDisplay')
             _mp.send_keys("{'display_options:price':0,'pricedisplay':2}")
 
