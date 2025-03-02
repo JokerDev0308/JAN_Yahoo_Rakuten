@@ -485,10 +485,11 @@ class PriceScraper:
                 
                 # Process single product
                 results = self.process_product(index, row)
-                
-                # Update DataFrame
-                for key, value in results.items():
-                    self.df.at[index, key] = value
+
+                if not not results:                    
+                    # Update DataFrame
+                    for key, value in results.items():
+                        self.df.at[index, key] = value
 
                 # Save results in batches
                 if (index + 1) % self.batch_size == 0 or (index + 1) == total_records:

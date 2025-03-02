@@ -13,7 +13,7 @@ class RakutenScraper:
             self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
             
             items = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".price--3zUvK"))
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
             )
             
             if items:
