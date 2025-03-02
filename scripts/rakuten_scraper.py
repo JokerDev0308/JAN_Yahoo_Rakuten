@@ -26,14 +26,16 @@ class RakutenScraper:
             
             print("==========",filter_button.get_attribute('value'))
 
-            # # Check if the value is '0' (unchecked), and click if so
-            # if filter_button.get_attribute('value') == '0':
-            #     filter_button.click()
+            # Check if the value is '0' (unchecked), and click if so
+            if filter_button.get_attribute('value') == '0':
+                filter_button.click()
 
-            #     # Optionally, wait for the checkbox to change its state (checked or unchecked)
-            #     WebDriverWait(self.driver, TIMEOUT).until(
-            #         EC.attribute_to_be(filter_button, 'value', '1')  # Wait for the value to change
-            #     )
+                # Optionally, wait for the checkbox to change its state (checked or unchecked)
+                WebDriverWait(self.driver, TIMEOUT).until(
+                    EC.attribute_to_be(filter_button, 'value', '1')  # Wait for the value to change
+                )
+
+            print("==========",filter_button.get_attribute('value'))
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
@@ -45,6 +47,7 @@ class RakutenScraper:
             if items:
                 # Assuming the first item has the price in text, remove unwanted characters
                 price = items[0].text.translate(str.maketrans("", "", "円,"))
+                print(price)
                 return price
             
             return "N/A"
