@@ -16,47 +16,40 @@ class RakutenScraper:
 
     def scrape_price(self, jan_code):
         try:
-            # Navigate to the Rakuten search URL with the given JAN code
-            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}?s=11&&used=0")
+            # Navigate to the URL with the provided JAN code
+            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
 
-            # Locate the form element using the CSS selector for the form
-            form = self.driver.find_element(By.CSS_SELECTOR, ".final-price-form--3Ko_l")
-
-            # Locate the JAN code input field (p), set, and _mp within the form
-            p = form.find_element(By.NAME, "p")
-            set = form.find_element(By.NAME, "set")
-            _mp = form.find_element(By.NAME, "_mp")
-
-            # Clear any existing value in the JAN code field (not necessary since we're setting it directly)
-            p.clear()  # Clear if there's any pre-existing value
-            p.send_keys(jan_code)  # Set the value of the JAN code input field to the provided JAN code
+            # Wait for the filter button to load and click if needed
+            filter_button = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='pd']"))
+            )
             
-            # Send additional required fields
-            p.send_keys('1')
-            set.send_keys('priceDisplay')
-            _mp.send_keys("{'display_options:price':0,'pricedisplay':2}")
+            print("==========",filter_button.get_attribute('value'))
 
-            # Submit the form
-            form.submit()
+            # Check if the value is '0' (unchecked), and click if so
+            if filter_button.get_attribute('value') != '0':
+                self.driver.execute_script("$('.control--FQ2nD').click()")
+                self.driver.execute_script("$('.final-price-form--3Ko_l').submit()")
+                sleep(3)
 
-            # Wait for the search results to load after form submission
-            WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".searchresultitem"))
+            filter_button = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='pd']"))
             )
 
-            # Once the results are loaded, find the price elements
-            items = self.driver.find_elements(By.CSS_SELECTOR, ".searchresultitem")
+            print("==========",filter_button.get_attribute('value'))
 
-            # Check if there are any items found
+            # Wait for the final price elements to load
+            items = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
+            )
+
+
+            # If there are price elements, extract the first one
             if items:
-                # Extract the price from the first item
-                price_elements = items[0].find_elements(By.CSS_SELECTOR, ".final-price")
-                
-                if price_elements:
-                    # Extract the price and clean it up (remove '円' and commas)
-                    price = price_elements[0].text.translate(str.maketrans("", "", "円,"))
-                    print(price)
-                    return price
+                # Assuming the first item has the price in text, remove unwanted characters
+                price = items[0].text.translate(str.maketrans("", "", "円,"))
+                print(price)
+                return price
             
             return "N/A"
 
@@ -64,7 +57,6 @@ class RakutenScraper:
             # Log the error and return a default value if something fails
             logger.error(f"Search by JAN failed: {e}")
             return "N/A"
-
 
 
     def close(self):
