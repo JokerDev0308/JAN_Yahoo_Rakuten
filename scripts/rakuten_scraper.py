@@ -26,7 +26,7 @@ class RakutenScraper:
             }
 
             # Send the GET request with form data
-            response = requests.get(self.base_url, params=form_data, timeout=TIMEOUT)
+            response = requests.get(self.base_url, params=form_data, timeout=10)
 
             # If the request was successful, process the response
             if response.status_code == 200:
