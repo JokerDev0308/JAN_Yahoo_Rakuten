@@ -451,9 +451,7 @@ class PriceScraper:
         elif rakuten_price != "N/A":
             min_price_url = rakuten_url
             min_price = rakuten_price
-        else:
-            return False
-
+       
         # Ensure 'row['price']' is a valid number before subtraction
         # if isinstance(row['price'], (int, float)):
         price_diff = float(row['price']) - float(min_price)

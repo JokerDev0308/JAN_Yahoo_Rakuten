@@ -18,8 +18,6 @@ class YahooScraper:
         Scrape price information from Yahoo Shopping.
         Returns a dictionary with 'url' and 'price', or 'N/A' if scraping fails.
         """
-        product = {'url': url, 'price': 'N/A'}
-
         try:
             # If no URL provided, search by JAN code
             if not url:
