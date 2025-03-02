@@ -28,7 +28,7 @@ class RakutenScraper:
             if filter_button.get_attribute('value') != '0':
                 filter_button.click()
 
-                self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
+                filter_button.get_attribute('value')
                 sleep(2)
 
             # Wait for the final price elements to load
