@@ -32,7 +32,7 @@ class RakutenScraper:
 
                 # Optionally, wait for the checkbox to change its state (checked or unchecked)
                 WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.attribute_to_be(filter_button, 'value', '1')  # Wait for the value to change
+                    EC.attribute_to_be(filter_button, 'value', '2')  # Wait for the value to change
                 )
 
             print("==========",filter_button.get_attribute('value'))
