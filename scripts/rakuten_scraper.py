@@ -28,6 +28,10 @@ class RakutenScraper:
             # Send the GET request with form data
             response = requests.get(self.base_url, params=form_data, timeout=10)
 
+            print("===========================")
+            print(response)
+            print("===========================")
+
             # If the request was successful, process the response
             if response.status_code == 200:
                 soup = BeautifulSoup(response.text, 'html.parser')
