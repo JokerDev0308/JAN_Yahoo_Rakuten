@@ -28,7 +28,7 @@ class RakutenScraper:
 
             # Check if the value is '0' (unchecked), and click if so
             if filter_button.get_attribute('value') != '0':
-                filter_button.click()
+                self.driver.execute_script("arguments[0].click();", filter_button)
 
                 # Optionally, wait for the checkbox to change its state (checked or unchecked)
                 WebDriverWait(self.driver, TIMEOUT).until(
