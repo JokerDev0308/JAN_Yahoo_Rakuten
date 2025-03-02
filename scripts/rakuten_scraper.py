@@ -26,19 +26,19 @@ class RakutenScraper:
 
             # Click the filter button if its value is not 0
             filter_button = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, ".control--FQ2nD input[type='checkbox']"))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, ".control--FQ2nD"))
             )
 
             print("==========",filter_button.get_attribute('value'))
 
-            # Check if the value is '0' (unchecked), and click if so
-            if filter_button.get_attribute('value') == '0':
-                filter_button.click()
+            # # Check if the value is '0' (unchecked), and click if so
+            # if filter_button.get_attribute('value') == '0':
+            #     filter_button.click()
 
-                # Optionally, wait for the checkbox to change its state (checked or unchecked)
-                WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.attribute_to_be(filter_button, 'value', '1')  # Wait for the value to change
-                )
+            #     # Optionally, wait for the checkbox to change its state (checked or unchecked)
+            #     WebDriverWait(self.driver, TIMEOUT).until(
+            #         EC.attribute_to_be(filter_button, 'value', '1')  # Wait for the value to change
+            #     )
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
