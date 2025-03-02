@@ -26,26 +26,32 @@ class RakutenScraper:
 
             print("Initial filter button value:", filter_button.get_attribute('value'))
 
-            # Check if the value is '0' (unchecked), and click it if so
+            # Check if the value is '0' (unchecked), and click it if so using JavaScript
             if filter_button.get_attribute('value') != '0':
-                # Click the filter checkbox (no need for jQuery, use Selenium's click method)
-                filter_button.click()
+                # Execute JavaScript to click the checkbox and submit the form
+                self.driver.execute_script("""
+                    var filterButton = document.querySelector("input[name='pd']");
+                    if (filterButton && filterButton.value != '0') {
+                        filterButton.click();
+                        // Find the form and submit it via JavaScript
+                        var form = document.querySelector('.final-price-form--3Ko_l');
+                        if (form) {
+                            form.submit();
+                        }
+                    }
+                """)
 
-                # Submit the form (find the form and submit it directly)
-                form = self.driver.find_element(By.CSS_SELECTOR, '.final-price-form--3Ko_l')
-                form.submit()
-
-                # Wait for the page to refresh or for new content to load (improve wait condition)
+                # Wait for the page to refresh or for new content to load (use explicit wait)
                 WebDriverWait(self.driver, TIMEOUT).until(
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
                 )
 
-            # Wait for the final price elements to load
+            # Wait for the final price elements to load after submitting the form
             items = self.driver.find_elements(By.CSS_SELECTOR, ".final-price")
 
             # If there are price elements, extract the first one
             if items:
-                # Assuming the first item has the price in text, clean it up by removing unwanted characters
+                # Clean the price text by removing '円' and commas
                 price = items[0].text.translate(str.maketrans("", "", "円,"))
                 print("Price extracted:", price)
                 return price
@@ -56,6 +62,7 @@ class RakutenScraper:
             # Log the error and return a default value if something fails
             logger.error(f"Search by JAN failed: {e}")
             return "N/A"
+
 
 
 
