@@ -21,7 +21,7 @@ class RakutenScraper:
 
             # Wait for the filter button to load and click if needed
             filter_button = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='pd']"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[name='pd'].control--FQ2nD"))
             )
             
             print("==========",filter_button.get_attribute('value'))
