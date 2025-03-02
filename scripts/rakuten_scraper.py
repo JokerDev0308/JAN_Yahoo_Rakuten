@@ -15,24 +15,39 @@ class RakutenScraper:
 
     def scrape_price(self, jan_code):
         try:
+            # Navigate to the URL with the provided JAN code
             self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
-            
+
+            # Wait for the filter button to load and click if needed
+            filter_button = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".control--FQ2nD"))
+            )
+
+            # Click the filter button if its value is not 0
+            if filter_button.get_attribute('value') != '0':
+                filter_button.click()
+
+            # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
             )
 
+            # Print the raw list of items (debugging)
             print(items)
 
-            
+            # If there are price elements, extract the first one
             if items:
+                # Assuming the first item has the price in text, remove unwanted characters
                 price = items[0].text.translate(str.maketrans("", "", "円,"))
                 return price
-                        
+            
             return "N/A"
 
         except Exception as e:
+            # Log the error and return a default value if something fails
             logger.error(f"Search by JAN failed: {e}")
             return "N/A"
+
 
     def close(self):
         pass  
