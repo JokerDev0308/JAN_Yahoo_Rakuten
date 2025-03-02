@@ -33,7 +33,7 @@ class RakutenScraper:
                     var filterButton = document.querySelector("input[name='pd']");
                     filterButton.click()
                 """)
-
+                sleep(2)
                 # Wait for the page to refresh or for new content to load (use explicit wait)
                 WebDriverWait(self.driver, TIMEOUT).until(
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
