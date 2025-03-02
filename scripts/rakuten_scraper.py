@@ -35,6 +35,8 @@ class RakutenScraper:
                 # Look for the price element (similar to the original scraping logic)
                 items = soup.select(".final-price")
 
+                print(items)
+
                 # If price elements are found, extract the first one
                 if items:
                     price = items[0].get_text(strip=True).translate(str.maketrans("", "", "円,"))
