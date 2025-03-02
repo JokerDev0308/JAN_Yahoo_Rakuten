@@ -440,6 +440,9 @@ class PriceScraper:
         price_diff = "N/A"
 
         # Determine minimum price and price difference
+        if (yahoo_price == "N/A" or yahoo_price == None or yahoo_price == 0.0) and (rakuten_price == "N/A" or rakuten_price == None or rakuten_price == 0.0):
+            return False
+        
         if yahoo_price != "N/A" and rakuten_price != "N/A":
             min_price = min(float(yahoo_price), float(rakuten_price))
             min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
@@ -491,6 +494,7 @@ class PriceScraper:
                 if (index + 1) % self.batch_size == 0 or (index + 1) == total_records:
                     self.save_results()
                     self.save_yahoo_urls()
+                    sleep(3)
 
                 sleep(1)  # Rate limiting
                 
