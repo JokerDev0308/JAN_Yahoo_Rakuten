@@ -24,7 +24,7 @@ class RakutenScraper:
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".control--FQ2nD"))
             )
             
-            print("==========",filter_button.get_attribute('value'))
+            print("==========",filter_button[0].get_attribute('value'))
 
             # # Check if the value is '0' (unchecked), and click if so
             # if filter_button.get_attribute('value') == '0':
