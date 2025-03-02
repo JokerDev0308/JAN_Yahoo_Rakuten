@@ -25,10 +25,10 @@ class RakutenScraper:
             )
 
             # Click the filter button if its value is not 0
-            if filter_button.get_attribute('value') != '0':
-                filter_button.click()
+            if filter_button[0].get_attribute('value') != '0':
+                filter_button[0].click()
 
-                print(filter_button.get_attribute('value'))
+                print(filter_button[0].get_attribute('value'))
                 sleep(2)
 
             # Wait for the final price elements to load
