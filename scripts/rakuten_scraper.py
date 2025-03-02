@@ -3,6 +3,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from webdriver_manager import WebDriverManager
+from time import sleep
 
 import logging
 # Configure logging
@@ -26,6 +27,7 @@ class RakutenScraper:
             # Click the filter button if its value is not 0
             if filter_button.get_attribute('value') != '0':
                 filter_button.click()
+                sleep(2)
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
