@@ -4,6 +4,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from webdriver_manager import WebDriverManager
 
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class RakutenScraper:
     def __init__(self):
         self.driver = WebDriverManager.get_driver("rakuten")
@@ -26,6 +31,7 @@ class RakutenScraper:
             return "N/A"
 
         except Exception as e:
+            logger.error(f"Search by JAN failed: {e}")
             return "N/A"
 
     def close(self):
