@@ -31,14 +31,7 @@ class RakutenScraper:
                 # Execute JavaScript to click the checkbox and submit the form
                 self.driver.execute_script("""
                     var filterButton = document.querySelector("input[name='pd']");
-                    if (filterButton && filterButton.value != '0') {
-                        filterButton.click();
-                        // Find the form and submit it via JavaScript
-                        var form = document.querySelector('.final-price-form--3Ko_l');
-                        if (form) {
-                            form.submit();
-                        }
-                    }
+                    filterButton.click()
                 """)
 
                 # Wait for the page to refresh or for new content to load (use explicit wait)
