@@ -31,7 +31,7 @@ class RakutenScraper:
                 self.driver.execute_script("arguments[0].click();", filter_button)
                 sleep(3)
 
-            print("==========",filter_button.get_attribute('value'))
+            # print("==========",filter_button.get_attribute('value'))
 
             # Wait for the final price elements to load
             items = WebDriverWait(self.driver, TIMEOUT).until(
