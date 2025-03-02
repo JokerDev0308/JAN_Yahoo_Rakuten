@@ -29,6 +29,7 @@ class RakutenScraper:
             # Check if the value is '0' (unchecked), and click if so
             if filter_button.get_attribute('value') != '0':
                 self.driver.execute_script("arguments[0].click();", filter_button)
+                sleep(3)
 
             print("==========",filter_button.get_attribute('value'))
 
