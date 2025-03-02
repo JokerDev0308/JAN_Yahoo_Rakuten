@@ -15,10 +15,12 @@ class RakutenScraper:
             items = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
             )
+
+            print(items)
+
             
             if items:
                 price = items[0].text.translate(str.maketrans("", "", "円,"))
-                print(price)
                 return price
                         
             return "N/A"
