@@ -44,8 +44,8 @@ class RakutenScraper:
             item = searchresultitem[0]
             
             # Extract screen price and shipping price
-            screen_price = item.find_element(By.CSS_SELECTOR, ".price--3zUvK")
-            ship_price = item.find_element(By.CSS_SELECTOR, ".points--DNEud")
+            screen_price = item.find_element(By.CSS_SELECTOR, ".price--3zUvK").text
+            ship_price = item.find_element(By.CSS_SELECTOR, ".points--DNEud").text
             print(screen_price,"=============", ship_price)
             # Clean and calculate the prices
             cleaned_screen_price = clean_price(screen_price)
