@@ -39,7 +39,7 @@ class YahooScraper:
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
 
-            items = self.driver.find_element(By.CSS_SELECTOR, ".LoopList__item")
+            items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
 
             min_price = float('inf')
             min_price_link = None
