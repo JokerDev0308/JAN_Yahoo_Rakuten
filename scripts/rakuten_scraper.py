@@ -10,8 +10,8 @@ def clean_price(price_str):
     if isinstance(price_str, (int, float)):  # If the input is numeric, convert it to a string
         price_str = str(price_str)
     
-    # Regex to capture only numbers with commas (e.g., "25,582" or "154") before the suffix "ポイント"
-    match = re.search(r'(\d{1,3}(?:,\d{3})*|\d+)(?=ポイント)', price_str)
+    # Regex to capture only numbers with commas (e.g., "25,582", "317,225") before "ポイント" or "円"
+    match = re.search(r'(\d{1,3}(?:,\d{3})*|\d+)(?=ポイント|円)', price_str)
     
     if match:
         cleaned_price = match.group(0)  # Get the matched part, which is the number
