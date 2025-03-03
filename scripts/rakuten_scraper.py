@@ -29,10 +29,7 @@ class RakutenScraper:
             # Check if the value is '0' (unchecked), and click it if so using JavaScript
             if filter_button.get_attribute('value') != '0':
                 # Execute JavaScript to click the checkbox and submit the form
-                self.driver.execute_script("""
-                    var filterButton = document.querySelector("input[name='pd']");
-                    filterButton.click()
-                """)
+                filter_button.click()
                 sleep(2)
                 # # Wait for the page to refresh or for new content to load (use explicit wait)
                 # WebDriverWait(self.driver, TIMEOUT).until(
