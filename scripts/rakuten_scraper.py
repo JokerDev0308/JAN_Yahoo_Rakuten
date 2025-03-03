@@ -42,6 +42,7 @@ class RakutenScraper:
                 print("========================")
                 print(self.driver.page_source)
                 print("========================")
+                exit()
 
             # Wait for the final price elements to load after submitting the form
             items = self.driver.find_elements(By.CSS_SELECTOR, ".final-price")
