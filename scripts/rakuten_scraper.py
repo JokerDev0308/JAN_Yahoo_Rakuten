@@ -9,15 +9,20 @@ def clean_price(price_str):
     # Ensure the input is a string
     if isinstance(price_str, (int, float)):  # If the input is numeric, convert it to a string
         price_str = str(price_str)
-
-    # Remove non-digit characters (except for the decimal point)
-    cleaned_price = re.sub(r'[^\d.]', '', price_str)
     
-    # Return the cleaned price as a float
-    try:
-        return float(cleaned_price)  # Convert it to a float after cleaning
-    except ValueError:
-        return 0.0  # Return 0 if conversion fails
+    # Regex to capture only numbers with commas (e.g., "25,582" or "154") before the suffix "ポイント"
+    match = re.search(r'(\d{1,3}(?:,\d{3})*|\d+)(?=ポイント)', price_str)
+    
+    if match:
+        cleaned_price = match.group(0)  # Get the matched part, which is the number
+        cleaned_price = cleaned_price.replace(',', '')  # Remove commas to get a pure numeric string
+        
+        try:
+            return float(cleaned_price)  # Convert to float
+        except ValueError:
+            return 0.0  # Return 0 if conversion fails
+    else:
+        return 0.0  # Return 0 if no match is found
 
 
 class RakutenScraper:
