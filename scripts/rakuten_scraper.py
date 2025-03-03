@@ -43,9 +43,10 @@ class RakutenScraper:
                 # Now click the checkbox using JavaScript (bypassing any potential overlay)
                 self.driver.execute_script("arguments[0].click();", filter_button)
 
-                # Submit the form via JavaScript
-                form = self.driver.find_element(By.CSS_SELECTOR, '.final-price-form--3Ko_l')
-                self.driver.execute_script("arguments[0].submit();", form)
+                print("============================")
+                print(self.driver.page_source)
+                print("============================")
+
 
                 # Wait for the page to refresh or for new content to load (use explicit wait)
                 WebDriverWait(self.driver, TIMEOUT).until(
