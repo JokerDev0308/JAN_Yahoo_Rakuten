@@ -28,18 +28,29 @@ class RakutenScraper:
 
             # Check if the value is '0' (unchecked), and click it if so using JavaScript
             if filter_button.get_attribute('value') != '0':
-                # Execute JavaScript to click the checkbox and submit the form
-                filter_button.click()
-                sleep(2)
-                # # Wait for the page to refresh or for new content to load (use explicit wait)
-                # WebDriverWait(self.driver, TIMEOUT).until(
-                #     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
-                # )
+                # Ensure the checkbox is in view by scrolling it into view using JavaScript
+                self.driver.execute_script("arguments[0].scrollIntoView();", filter_button)
+                sleep(1)  # Let the scroll take effect
+                
+                # Check if any overlay or popup is blocking the checkbox
+                blocking_element = self.driver.find_elements(By.CSS_SELECTOR, '.message-content--3IUWz')
+                if blocking_element:
+                    # If a blocking element is found, wait for it to disappear
+                    WebDriverWait(self.driver, TIMEOUT).until(
+                        EC.invisibility_of_element_located((By.CSS_SELECTOR, '.message-content--3IUWz'))
+                    )
+                
+                # Now click the checkbox using JavaScript (bypassing any potential overlay)
+                self.driver.execute_script("arguments[0].click();", filter_button)
 
-                print("========================")
-                print(self.driver.page_source)
-                print("========================")
-                exit()
+                # Submit the form via JavaScript
+                form = self.driver.find_element(By.CSS_SELECTOR, '.final-price-form--3Ko_l')
+                self.driver.execute_script("arguments[0].submit();", form)
+
+                # Wait for the page to refresh or for new content to load (use explicit wait)
+                WebDriverWait(self.driver, TIMEOUT).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
+                )
 
             # Wait for the final price elements to load after submitting the form
             items = self.driver.find_elements(By.CSS_SELECTOR, ".final-price")
@@ -57,6 +68,7 @@ class RakutenScraper:
             # Log the error and return a default value if something fails
             logger.error(f"Search by JAN failed: {e}")
             return "N/A"
+
 
 
 
