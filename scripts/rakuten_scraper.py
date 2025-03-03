@@ -32,7 +32,8 @@ class RakutenScraper:
     def scrape_price(self, jan_code):
         try:
             # Navigate to the product search page
-            self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
+            url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
+            self.driver.get(url)
             
             # Wait for the button that leads to the best shop link to load
             button = WebDriverWait(self.driver, TIMEOUT).until(
@@ -56,14 +57,13 @@ class RakutenScraper:
             # Extract screen price and shipping price
             screen_price = item.find_element(By.CSS_SELECTOR, ".price--3zUvK").text
             ship_price = item.find_element(By.CSS_SELECTOR, ".points--DNEud").text
-            product_url = item.find_element(By.CSS_SELECTOR,".title-link--3Yuev").get_attribute('href')
 
             cleaned_screen_price = clean_price(screen_price)
             cleaned_ship_price = clean_price(ship_price)
 
             result_price = cleaned_screen_price - cleaned_ship_price  # If you're including shipping, sum them.
 
-            return {"price":result_price, "url":product_url}
+            return {"price":result_price, "url":url}
 
         except Exception as e:
             print(f"Error occurred: {e}")
