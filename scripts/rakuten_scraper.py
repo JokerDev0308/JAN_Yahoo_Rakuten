@@ -39,6 +39,10 @@ class RakutenScraper:
                     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".final-price"))
                 )
 
+                print("========================")
+                print(self.driver.page_source)
+                print("========================")
+
             # Wait for the final price elements to load after submitting the form
             items = self.driver.find_elements(By.CSS_SELECTOR, ".final-price")
 
