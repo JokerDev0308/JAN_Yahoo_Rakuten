@@ -81,7 +81,7 @@ class PriceScraper:
             yahoo_url = "N/A"
 
         if rakuten_product != "N/A":
-            rakuten_price = clean_price(rakuten_product.get("price", "N/A"))
+            rakuten_price = rakuten_product.get("price", "N/A")
             rakuten_url = rakuten_product.get("url", "N/A")
         else:
             rakuten_price = "N/A"
