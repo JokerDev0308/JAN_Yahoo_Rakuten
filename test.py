@@ -35,9 +35,11 @@ class YahooScraper:
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            items = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".LoopList__item"))
+            WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
+
+            items = self.driver.find_element(By.CSS_SELECTOR, ".LoopList__item")
 
             min_price = float('inf')
             min_price_link = None
