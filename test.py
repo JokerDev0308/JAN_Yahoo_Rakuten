@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from webdriver_manager import WebDriverManager
 
+from time import sleep
+
 import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -106,8 +108,12 @@ class YahooScraper:
 if __name__ == "__main__":
     scraper = YahooScraper()
     print(scraper.scrape_price("4549980770559"))
+    sleep(1)
     print(scraper.scrape_price("4549980789025"))
+    sleep(1)
     print(scraper.scrape_price("4960759913784"))
+    sleep(1)
     print(scraper.scrape_price("4545350056452"))
+    sleep(1)
     print(scraper.scrape_price("4549980789018"))
     scraper.close()
