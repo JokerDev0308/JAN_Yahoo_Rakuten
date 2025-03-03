@@ -20,13 +20,9 @@ class YahooScraper:
         """
         try:
             # If no URL provided, search by JAN code
-            if not url:
+            if not url or url == "nan":
                 return self._search_by_jan(jan_code)
             
-            # If URL is invalid
-            if url == "nan":
-                return "N/A"
-
             # Direct URL scraping
             return self._scrape_from_url(url)
 

@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
+from time import sleep
 from webdriver_manager import WebDriverManager
 import re
 
@@ -45,10 +46,10 @@ class RakutenScraper:
             # Navigate to the link of the best shop
             self.driver.get(link)
 
+            sleep(3)
+
             # Wait for the search result item to appear
-            searchresultitem = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".searchresultitem"))
-            )
+            searchresultitem = self.driver.find_element(By.CSS_SELECTOR, ".searchresultitem")
             
             # Assuming we're interested in the first item in the list
             item = searchresultitem[0]
