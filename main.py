@@ -70,7 +70,7 @@ class PriceScraper:
             rakuten_future = executor.submit(self.rakuten_scraper.scrape_price, jan)
             
             yahoo_product = yahoo_future.result()
-            rakuten_price = rakuten_future.result()
+            rakuten_product = rakuten_future.result()
 
         # Handle Yahoo product price and URL, default to None if not available
         if yahoo_product != "N/A":
@@ -80,8 +80,13 @@ class PriceScraper:
             yahoo_price = "N/A"
             yahoo_url = "N/A"
 
-        # Rakuten URL generation
-        rakuten_url = f"https://search.rakuten.co.jp/search/mall/{jan}/?s=11&used=0"
+        if rakuten_product != "N/A":
+            rakuten_price = clean_price(rakuten_product.get("price", "N/A"))
+            rakuten_url = rakuten_product.get("url", "N/A")
+        else:
+            rakuten_price = "N/A"
+            rakuten_url = "N/A"
+
 
         # Initialize default values
         min_price_url = "N/A"

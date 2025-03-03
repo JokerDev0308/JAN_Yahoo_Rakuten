@@ -56,13 +56,14 @@ class RakutenScraper:
             # Extract screen price and shipping price
             screen_price = item.find_element(By.CSS_SELECTOR, ".price--3zUvK").text
             ship_price = item.find_element(By.CSS_SELECTOR, ".points--DNEud").text
-            
+            product_url = item.find_element(By.CSS_SELECTOR,".title-link--3Yuev").get_attribute('href')
+
             cleaned_screen_price = clean_price(screen_price)
             cleaned_ship_price = clean_price(ship_price)
 
             result_price = cleaned_screen_price - cleaned_ship_price  # If you're including shipping, sum them.
 
-            return result_price
+            return {"price":result_price, "url":product_url}
 
         except Exception as e:
             print(f"Error occurred: {e}")
