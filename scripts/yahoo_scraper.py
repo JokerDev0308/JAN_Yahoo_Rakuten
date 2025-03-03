@@ -4,6 +4,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from webdriver_manager import WebDriverManager
 
+import re
+
+def clean_price(price_str):
+    # Remove non-numeric characters, keeping only digits and period (.)
+    cleaned_price = re.sub(r'[^\d.]', '', price_str)
+    
+    # If the cleaned string is empty, return a default value (e.g., 0)
+    if cleaned_price == "":
+        return "N/A"
+    
+    return float(cleaned_price)
+
 import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -69,7 +81,7 @@ class YahooScraper:
         try:
             price_text = item.find_element(By.CSS_SELECTOR, 
                 ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV").text
-            return int(price_text.translate(str.maketrans("", "", "円,")))
+            return clean_price(price_text)
         except Exception:
             return None
 
@@ -84,7 +96,7 @@ class YahooScraper:
             if price_elements:
                 return {
                     'url': url,
-                    'price': price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
+                    'price': clean_price(price_elements[0].text)
                 }
             
             return {
