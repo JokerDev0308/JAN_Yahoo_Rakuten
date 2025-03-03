@@ -103,5 +103,9 @@ class YahooScraper:
 
 if __name__ == "__main__":
     scraper = YahooScraper()
-    print(scraper.scrape_price("4547410528282"))
+    print(scraper.scrape_price("4549980770559"))
+    print(scraper.scrape_price("4549980789025"))
+    print(scraper.scrape_price("4960759913784"))
+    print(scraper.scrape_price("4545350056452"))
+    print(scraper.scrape_price("4549980789018"))
     scraper.close()
