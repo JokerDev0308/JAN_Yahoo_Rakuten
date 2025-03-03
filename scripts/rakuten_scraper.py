@@ -21,32 +21,49 @@ class RakutenScraper:
 
     def scrape_price(self, jan_code):
         try:
+            # Navigate to the product search page
             self.driver.get(f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0")
             
+            # Wait for the button that leads to the best shop link to load
             button = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
             )
+            
+            # Retrieve the link to the best shop
+            link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
 
-            link = button[0].getget_attribute('href')
-
+            # Navigate to the link of the best shop
             self.driver.get(link)
 
+            # Wait for the search result item to appear
             searchresultitem = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".searchresultitem"))
             )
-
-            screen_price = searchresultitem.find_element(By.CSS_SELECTOR, ".price--3zUvK")
-
-            ship_price = searchresultitem.find_element(By.CSS_SELECTOR, ".points--DNEud")
             
-            result_price = clean_price(screen_price) - clean_price(ship_price)
-
-            print("=========result_price")
+            # Assuming we're interested in the first item in the list
+            item = searchresultitem[0]
             
+            # Extract screen price and shipping price
+            screen_price = item.find_element(By.CSS_SELECTOR, ".price--3zUvK")
+            ship_price = item.find_element(By.CSS_SELECTOR, ".points--DNEud")
+            print(screen_price,"=============", ship_price)
+            # Clean and calculate the prices
+            cleaned_screen_price = clean_price(screen_price)
+            cleaned_ship_price = clean_price(ship_price)
+
+            
+
+            # Assuming shipping price is added, not subtracted
+            result_price = cleaned_screen_price - cleaned_ship_price  # If you're including shipping, sum them.
+
+            print("=========", result_price)
+
             return result_price
 
         except Exception as e:
+            print(f"Error occurred: {e}")
             return "N/A"
+
 
     def close(self):
         pass  
