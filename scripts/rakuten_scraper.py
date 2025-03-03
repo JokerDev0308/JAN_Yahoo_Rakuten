@@ -6,14 +6,19 @@ from webdriver_manager import WebDriverManager
 import re
 
 def clean_price(price_str):
-    # Remove non-numeric characters, keeping only digits and period (.)
+    # Ensure the input is a string
+    if isinstance(price_str, (int, float)):  # If the input is numeric, convert it to a string
+        price_str = str(price_str)
+
+    # Remove non-digit characters (except for the decimal point)
     cleaned_price = re.sub(r'[^\d.]', '', price_str)
     
-    # If the cleaned string is empty, return a default value (e.g., 0)
-    if cleaned_price == "":
-        return "N/A"
-    
-    return float(cleaned_price)
+    # Return the cleaned price as a float
+    try:
+        return float(cleaned_price)  # Convert it to a float after cleaning
+    except ValueError:
+        return 0.0  # Return 0 if conversion fails
+
 
 class RakutenScraper:
     def __init__(self):
