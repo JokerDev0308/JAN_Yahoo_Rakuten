@@ -156,15 +156,32 @@ class PriceScraperUI:
 
     def display_main_content(self):
         try:
+            # Read the Excel file
             df = pd.read_excel(config.OUTPUT_XLSX)
+            
+            # Drop "Yahoo! Link" if it exists
             if "Yahoo! Link" in df.columns:
                 df.drop(columns=["Yahoo! Link"], inplace=True)
             
+            # Rename columns and reorder them
             df = df.rename(columns=column_name_mapping)[ordered_columns]
+            
+            # Convert specified columns to numeric (int), safely handling errors
+            df['yahoo_実質価格'] = pd.to_numeric(df['yahoo_実質価格'], errors='coerce').fillna(0).astype(int)
+            df['楽天_実質価格'] = pd.to_numeric(df['楽天_実質価格'], errors='coerce').fillna(0).astype(int)
+            df['価格差（マスタ価格‐Y!と楽の安い方）'] = pd.to_numeric(df['価格差（マスタ価格‐Y!と楽の安い方）'], errors='coerce').fillna(0).astype(int)
+            
+            # Adjust index to start from 1
             df.index = df.index + 1
+            
+            # Calculate height for table display
             height = min(len(df) * 35 + 38, 800)
-            # st.dataframe(df, use_container_width=True, height=height, key="result")
-            st.table(df)
+            
+            # Display the table in Streamlit
+            st.table(df)  # For smaller tables
+            # If you prefer scrollable tables:
+            # st.dataframe(df, use_container_width=True, height=height)
+            
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
