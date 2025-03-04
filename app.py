@@ -163,7 +163,8 @@ class PriceScraperUI:
             df = df.rename(columns=column_name_mapping)[ordered_columns]
             df.index = df.index + 1
             height = min(len(df) * 35 + 38, 800)
-            st.dataframe(df, use_container_width=True, height=height, key="result")
+            # st.dataframe(df, use_container_width=True, height=height, key="result")
+            st.table(df)
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
