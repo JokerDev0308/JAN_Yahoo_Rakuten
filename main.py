@@ -69,7 +69,7 @@ class PriceScraper:
 
     def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
         """Process a single product and return results"""
-        jan = row['JAN']
+        jan = str(row['JAN'])
         saved_yahoo_url = str(row['Yahoo Link'])
         saved_rakuten_url = str(row['Rakuten Link'])
         
