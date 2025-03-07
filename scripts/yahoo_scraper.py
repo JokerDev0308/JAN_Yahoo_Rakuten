@@ -14,7 +14,6 @@ class YahooScraper:
         self.driver = WebDriverManager.get_driver("yahoo")
 
     def scrape_price(self, jan_code, url):
-        print("======yyyy========", url, url == "nan" , url == "N/A" , not url , url == None, len(url) == 0 )
         """
         Scrape price information from Yahoo Shopping.
         Returns a dictionary with 'url' and 'price', or 'N/A' if scraping fails.
@@ -36,6 +35,7 @@ class YahooScraper:
     def _search_by_jan(self, jan_code):
         """Helper method to search and find lowest price by JAN code"""
         try:
+            print(jan_code)
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
             items = WebDriverWait(self.driver, TIMEOUT).until(

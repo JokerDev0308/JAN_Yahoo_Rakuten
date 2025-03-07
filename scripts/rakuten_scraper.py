@@ -30,9 +30,8 @@ class RakutenScraper:
         self.driver = WebDriverManager.get_driver("rakuten")
 
     def scrape_price(self, jan_code, saved_link):
-        print("======RRRRRR========", saved_link, saved_link == "nan" , saved_link == "N/A" , not saved_link, saved_link == None )
         try:
-            if saved_link == None or saved_link == "N/A":
+            if saved_link == 'nan' or saved_link == "N/A" or not saved_link:
                 # Navigate to the product search page
                 url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
                 self.driver.get(url)
