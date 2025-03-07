@@ -21,7 +21,7 @@ class YahooScraper:
         """
         try:
             # If no URL provided, search by JAN code
-            if not url or url == "N/A" or url == "nan":
+            if url == "nan" or url == "N/A" or not url  :
                 logger.info(f"go to jan")
                 return self._search_by_jan(jan_code)
             
