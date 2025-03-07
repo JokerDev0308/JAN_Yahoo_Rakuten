@@ -36,6 +36,8 @@ st.set_page_config(
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
+        self.out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
+
 
         if 'logged_in' not in st.session_state:
             st.session_state['logged_in'] = False
@@ -141,11 +143,9 @@ class PriceScraperUI:
         file_path = Path(config.RUNNING)
         file_path.unlink()
 
+
     def display_main_content(self):
-        try:
-            # Initialize an empty DataFrame with the specified output columns
-            out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
-            
+        try:            
             # Read the scraped Excel file
             try:
                 scraped_df = pd.read_excel(config.SCRAPED_XLSX)
@@ -156,71 +156,63 @@ class PriceScraperUI:
                 st.warning("Excelファイルにデータが含まれていません。")
                 return
             
-            out_df['JAN（マスタ）'] = scraped_df['JAN']
-            out_df['価格（マスタ）'] = scraped_df['price']
-            out_df['yahoo_実質価格'] = scraped_df['Yahoo Price']
-            out_df['楽天_実質価格'] = scraped_df['Rakuten Price']
+            # Copy necessary columns from scraped_df to self.out_df
+            self.out_df['JAN（マスタ）'] = scraped_df['JAN']
+            self.out_df['価格（マスタ）'] = scraped_df['price']
+            self.out_df['yahoo_実質価格'] = scraped_df['Yahoo Price']
+            self.out_df['楽天_実質価格'] = scraped_df['Rakuten Price']
             
-            
-            scraped_df['Yahoo Price'].fillna(float('inf'), inplace=True)  
-            scraped_df['Rakuten Price'].fillna(float('inf'), inplace=True)  
+            # Handle missing prices by filling NaN values with 'inf'
+            scraped_df['Yahoo Price'] = scraped_df['Yahoo Price'].fillna(float('inf'))
+            scraped_df['Rakuten Price'] = scraped_df['Rakuten Price'].fillna(float('inf'))
 
             # Calculate the minimum price and select the corresponding link
             min_price = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
-            out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - min_price
-            out_df['対象リンク（Y!と楽の安い方）'] = scraped_df.apply(
+            self.out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - min_price
+            self.out_df['対象リンク（Y!と楽の安い方）'] = scraped_df.apply(
                 lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
                 axis=1
             )
 
-            out_df['データ取得時間（Y!と楽の安い方）'] = scraped_df['datetime']
+            self.out_df['データ取得時間（Y!と楽の安い方）'] = scraped_df['datetime']
 
             # Adjust the DataFrame index to start from 1
-            out_df.index = out_df.index + 1
+            self.out_df.index = self.out_df.index + 1
             
             # Dynamically calculate the table height
-            height = min(len(out_df) * 35 + 38, 800)
+            height = min(len(self.out_df) * 35 + 38, 800)
             
             # Display the dataframe in Streamlit with column configuration for the "Min Link" column
             st.dataframe(
-                out_df, 
+                self.out_df, 
                 use_container_width=True, 
                 height=height, 
                 key="result",
                 column_config={
-                    "Min Link": st.column_config.LinkColumn()  # Ensures that 'Min Link' is clickable
+                    "対象リンク（Y!と楽の安い方）": st.column_config.LinkColumn()  # Ensures that 'Min Link' is clickable
                 }
             )
 
         except Exception as e:
             st.error(f"予期しないエラーが発生しました: {str(e)}")
 
-
-
     def download_excel(self):
-        # try:
-        #     df = pd.read_excel(config.SCRAPED_XLSX)
-        #     if "Yahoo Link" in df.columns:
-        #         df.drop(columns=["Yahoo Link"], inplace=True)
+        try:
+            temp_file_path = "/tmp/output.xlsx"
+            self.out_df.to_excel(temp_file_path, index=False)
 
-        #     df = df.rename(columns=column_name_mapping)[ordered_columns]
+            with open(temp_file_path, "rb") as file:
+                st.download_button(
+                    label="ダウンロード",
+                    data=file,
+                    file_name="output.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True
+                )
 
-        #     temp_file_path = "/tmp/output.xlsx"
-        #     df.to_excel(temp_file_path, index=False)
-
-        #     with open(temp_file_path, "rb") as file:
-        #         st.download_button(
-        #             label="ダウンロード",
-        #             data=file,
-        #             file_name="output.xlsx",
-        #             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        #             use_container_width=True
-        #         )
-
-        #     os.remove(temp_file_path)
-        # except FileNotFoundError:
-        #     st.warning("スクレイピングされたデータはまだない。")
-        print('comming soon')
+            os.remove(temp_file_path)
+        except FileNotFoundError:
+            st.warning("スクレイピングされたデータはまだない。")
 
     
     def logout(self):
