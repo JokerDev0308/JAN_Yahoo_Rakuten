@@ -156,23 +156,24 @@ class PriceScraperUI:
                 st.warning("Excelファイルにデータが含まれていません。")
                 return
             
-            # Fill out_df with the common columns found in scraped_df
-            for col in scraped_df.columns:
-                if col in out_df.columns:
-                    out_df[col] = scraped_df[col]
-
-            # Handle missing prices and links by filling NaNs with placeholders (if necessary)
-            scraped_df['Yahoo Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
-            scraped_df['Rakuten Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
-            # scraped_df['Yahoo Link'].fillna("No link", inplace=True)  # Placeholder for missing links
-            # scraped_df['Rakuten Link'].fillna("No link", inplace=True)  # Placeholder for missing links
+            out_df['JAN（マスタ）'] = scraped_df['JAN']
+            out_df['価格（マスタ）'] = scraped_df['price']
+            out_df['yahoo_実質価格'] = scraped_df['Yahoo Price']
+            out_df['楽天_実質価格'] = scraped_df['Rakuten Price']
+            
+            
+            scraped_df['Yahoo Price'].fillna(float('inf'), inplace=True)  
+            scraped_df['Rakuten Price'].fillna(float('inf'), inplace=True)  
 
             # Calculate the minimum price and select the corresponding link
             out_df['Min Price'] = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
+            out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - out_df['Min Price']
             out_df['Min Link'] = scraped_df.apply(
                 lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
                 axis=1
             )
+
+            out_df['データ取得時間（Y!と楽の安い方）'] = scraped_df['datetime']
 
             # Adjust the DataFrame index to start from 1
             out_df.index = out_df.index + 1
