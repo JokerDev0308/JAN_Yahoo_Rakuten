@@ -69,7 +69,7 @@ class PriceScraper:
     def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
         """Process a single product and return results"""
         jan = row['JAN']
-        saved_yahoo_url = row.get('Yahoo! Link')
+        saved_yahoo_url = row.get('Yahoo Link')
         saved_rakuten_url = row.get('Rakuten Link')
         
         with ThreadPoolExecutor(max_workers=2) as executor:
@@ -124,7 +124,7 @@ class PriceScraper:
 
         return {
             'Yahoo Price': yahoo_price,
-            'Yahoo! Link': yahoo_url,
+            'Yahoo Link': yahoo_url,
             'Rakuten Price': rakuten_price,
             'Rakuten Link': rakuten_url,
             # 'Min Price URL': min_price_url,

@@ -11,6 +11,6 @@ WAITING = False
 CURRENT_USER = None
 LOGIN_STATE = {}
 
-JAN_COLUMNS = ['JAN', 'price', 'Yahoo! Link', 'Rakuten Link']
-SCRAPED_COLUMNS = ['JAN', 'price', 'Yahoo! Price', 'Rakuten Price', 'datetime']
+JAN_COLUMNS = ['JAN', 'price', 'Yahoo Link', 'Rakuten Link']
+SCRAPED_COLUMNS = ['JAN', 'price', 'Yahoo Price', 'Rakuten Price', 'datetime']
 OUTPUT_COLUMNS = ['JAN（マスタ）', '価格（マスタ）', 'yahoo_実質価格', '楽天_実質価格', '価格差（マスタ価格‐Y!と楽の安い方）', '対象リンク（Y!と楽の安い方）', 'データ取得時間（Y!と楽の安い方）']
