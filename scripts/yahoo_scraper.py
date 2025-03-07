@@ -54,11 +54,13 @@ class YahooScraper:
             for item in items:
                 price = self._extract_price_from_item(item)
                 if price and price < min_price:
-                    link = item.find_element(By.CSS_SELECTOR, 
-                        ".SearchResult_SearchResult__cheapestButton__SFFlT")
-                    if link:
+                    try:
+                        link = item.find_element(By.CSS_SELECTOR, "a[data-guidance='item']")
                         min_price = price
                         min_price_link = link
+                    except Exception as e:
+                        logger.warning(f"Could not find link in item: {e}")
+                        continue
             
             logger.info(f"=={min_price}===={min_price_link.get_attribute('href')}==")
 
