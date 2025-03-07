@@ -37,9 +37,14 @@ class YahooScraper:
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
-            )
+            # Wait for either the regular results or "no results found"
+            try:
+                items = WebDriverWait(self.driver, TIMEOUT).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, ".LoopList__item, .ExceptionContent"))
+                )
+            except Exception as e:
+                logger.warning(f"No search results found for JAN {jan_code}")
+                return {'price': 'N/A', 'url': None}
 
             items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
 
