@@ -20,10 +20,12 @@ class YahooScraper:
         """
         try:
             # If no URL provided, search by JAN code
-            if not url or url == "nan":
+            if not url or url == "nan" or len(url) == 0:
+                logger.info(f"go to jan")
                 return self._search_by_jan(jan_code)
             
             # Direct URL scraping
+            logger.info(f"go to Direct url")
             return self._scrape_from_url(url)
 
         except Exception as e:
@@ -50,10 +52,13 @@ class YahooScraper:
                     if link:
                         min_price = price
                         min_price_link = link
+            
+            logger.info(f"=={min_price}===={min_price_link.get_attribute('href')}==")
 
             if min_price != float('inf') and min_price_link:
                 return self._scrape_from_url(min_price_link.get_attribute('href'), min_price)
             
+            logger.info( {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None})
             return {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None}
 
         except Exception as e:
@@ -66,7 +71,8 @@ class YahooScraper:
             price_text = item.find_element(By.CSS_SELECTOR, 
                 ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV").text
             return int(price_text.translate(str.maketrans("", "", "円,")))
-        except Exception:
+        except Exception as e:
+            logger.error(f"Search by JAN failed: {e}")
             return None
 
     def _scrape_from_url(self, url, fallback_price=None):
@@ -90,7 +96,10 @@ class YahooScraper:
 
         except Exception as e:
             logger.error(f"URL scraping failed: {e}")
-            return "N/A"
+            return {
+                'url': url,
+                'price': str(fallback_price) if fallback_price else "N/A"
+            }
 
     def close(self):
         """Close the web driver"""
