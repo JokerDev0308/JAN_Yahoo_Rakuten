@@ -50,7 +50,6 @@ class PriceScraper:
                         scraped_df[col] = saved_scraped_df[col].astype(str)
             else:
                 self.df = jan_df
-                self.save_results()
                 return
 
             # Ensure 'JAN' and 'price' columns exist in both dataframes
