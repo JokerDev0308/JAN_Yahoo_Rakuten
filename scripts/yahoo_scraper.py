@@ -37,38 +37,23 @@ class YahooScraper:
         try:
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            # Wait for either the regular results or "no results found"
-            try:
-                items = WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, ".LoopList__item, .ExceptionContent"))
-                )
-            except Exception as e:
-                logger.warning(f"No search results found for JAN {jan_code}")
-                return {'price': 'N/A', 'url': None}
+            link_item = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
+            )
 
-            items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
-
-            min_price = float('inf')
-            min_price_link = None
-
-            for item in items:
-                price = self._extract_price_from_item(item)
-                if price and price < min_price:
-                    try:
-                        link = item.find_element(By.CSS_SELECTOR, "a[data-guidance='item']")
+            if link_item and len(link_item) > 0:
+                cheapest_link = link_item[0].find_element(By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT")
+                return self._scrape_from_url(cheapest_link)
+            else:
+                items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
+                min_price = float('inf')
+                for item in items:
+                    price = self._extract_price_from_item(item)
+                    if price and price < min_price:
                         min_price = price
-                        min_price_link = link
-                    except Exception as e:
-                        logger.warning(f"Could not find link in item: {e}")
-                        continue
-            
-            logger.info(f"=={min_price}===={min_price_link.get_attribute('href')}==")
-
-            if min_price != float('inf') and min_price_link:
-                return self._scrape_from_url(min_price_link.get_attribute('href'), min_price)
-            
-            logger.info( {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None})
-            return {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None}
+                                
+                logger.info( {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None})
+                return {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None}
 
         except Exception as e:
             logger.error(f"Search by JAN failed: {e}")
