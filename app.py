@@ -188,7 +188,7 @@ class PriceScraperUI:
 
     def display_main_content(self):
         try:            
-            df = self.result_df()            
+            df:pd.DataFrame = self.result_df()            
             # Dynamically calculate the table height
             height = min(len(df) * 35 + 38, 800)
             
@@ -209,7 +209,7 @@ class PriceScraperUI:
 
     def download_excel(self):
         try:
-            df = self.result_df()
+            df:pd.DataFrame = self.result_df()
             temp_file_path = "/tmp/output.xlsx"
             df.to_excel(temp_file_path, index=False)
 
