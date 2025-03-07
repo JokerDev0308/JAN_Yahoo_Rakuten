@@ -40,6 +40,7 @@ class PriceScraper:
                 out_df = pd.read_excel(config.SCRAPED_XLSX)
             else:
                 self.df = jan_df
+                self.save_results()
                 return
 
             # Ensure 'JAN' and 'price' columns exist in both dataframes
