@@ -42,7 +42,7 @@ class YahooScraper:
             )
 
             if link_item and len(link_item) > 0:
-                cheapest_link = link_item[0].find_element(By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT")
+                cheapest_link = link_item[0].get_attribute('href')
                 return self._scrape_from_url(cheapest_link)
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
