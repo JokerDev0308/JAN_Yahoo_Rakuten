@@ -50,7 +50,7 @@ class YahooScraper:
                 price = self._extract_price_from_item(item)
                 if price and price < min_price:
                     link = item.find_element(By.CSS_SELECTOR, 
-                        "SearchResult_SearchResult__cheapestButton__SFFlT")
+                        ".SearchResult_SearchResult__cheapestButton__SFFlT")
                     if link:
                         min_price = price
                         min_price_link = link
