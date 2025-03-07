@@ -20,7 +20,7 @@ class YahooScraper:
         """
         try:
             # If no URL provided, search by JAN code
-            if not url or url == "nan" or len(url) == 0:
+            if not url or url == "nan":
                 logger.info(f"go to jan")
                 return self._search_by_jan(jan_code)
             
