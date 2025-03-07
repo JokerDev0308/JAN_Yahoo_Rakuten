@@ -148,7 +148,10 @@ class PriceScraperUI:
             out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
             # Read the scraped Excel file
             try:
-                scraped_df = pd.read_excel(config.SCRAPED_XLSX)
+                if Path(config.SCRAPED_XLSX):
+                    scraped_df = pd.read_excel(config.SCRAPED_XLSX)
+                else:
+                    return out_df.empty()
             except FileNotFoundError:
                 st.warning("スクレイピングされたデータはまだない。")
                 return out_df.empty()
