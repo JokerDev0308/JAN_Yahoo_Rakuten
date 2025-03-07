@@ -166,9 +166,9 @@ class PriceScraperUI:
             scraped_df['Rakuten Price'].fillna(float('inf'), inplace=True)  
 
             # Calculate the minimum price and select the corresponding link
-            out_df['Min Price'] = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
-            out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - out_df['Min Price']
-            out_df['Min Link'] = scraped_df.apply(
+            min_price = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
+            out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - min_price
+            out_df['対象リンク（Y!と楽の安い方）'] = scraped_df.apply(
                 lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
                 axis=1
             )
