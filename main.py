@@ -69,8 +69,8 @@ class PriceScraper:
     def process_product(self, index: int, row: pd.Series) -> Dict[str, Any]:
         """Process a single product and return results"""
         jan = row['JAN']
-        saved_yahoo_url = row.get('Yahoo Link', "N/A")
-        saved_rakuten_url = row.get('Rakuten Link', "N/A")
+        saved_yahoo_url = row['Yahoo Link']
+        saved_rakuten_url = row['Rakuten Link']
         
         with ThreadPoolExecutor(max_workers=2) as executor:
             yahoo_future = executor.submit(self.yahoo_scraper.scrape_price, jan, saved_yahoo_url)
@@ -93,34 +93,6 @@ class PriceScraper:
         else:
             rakuten_price = "N/A"
             rakuten_url = "N/A"
-
-
-        # # Initialize default values
-        # min_price_url = "N/A"
-        # price_diff = "N/A"
-
-        # # Determine minimum price and price difference
-
-        
-        # if yahoo_price == "N/A" and rakuten_price == "N/A":
-        #     return False
-
-
-        # if yahoo_price != "N/A" and rakuten_price != "N/A":
-        #     min_price = min(float(yahoo_price), float(rakuten_price))
-        #     min_price_url = yahoo_url if min_price == float(yahoo_price) else rakuten_url
-            
-        # elif yahoo_price != "N/A":
-        #     min_price_url = yahoo_url
-        #     min_price = yahoo_price
-        # elif rakuten_price != "N/A":
-        #     min_price_url = rakuten_url
-        #     min_price = rakuten_price
-
-       
-        # Ensure 'row['price']' is a valid number before subtraction
-        # if isinstance(row['price'], (int, float)):
-        # price_diff = float(row['price']) - float(min_price)
 
         return {
             'Yahoo Price': yahoo_price,
