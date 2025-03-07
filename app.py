@@ -1,5 +1,5 @@
 import streamlit as st
-
+from pandas.errors import EmptyDataError
 import pandas as pd
 import config
 import os
@@ -143,29 +143,58 @@ class PriceScraperUI:
 
     def display_main_content(self):
         try:
+            # Initialize an empty DataFrame with the specified output columns
             out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
-            scraped_df = pd.read_excel(config.SCRAPED_XLSX)
-
+            
+            # Read the scraped Excel file
+            try:
+                scraped_df = pd.read_excel(config.SCRAPED_XLSX)
+            except FileNotFoundError:
+                st.warning("スクレイピングされたデータはまだない。")
+                return
+            except EmptyDataError:
+                st.warning("Excelファイルにデータが含まれていません。")
+                return
+            
+            # Fill out_df with the common columns found in scraped_df
             for col in scraped_df.columns:
                 if col in out_df.columns:
                     out_df[col] = scraped_df[col]
 
-            out_df['Min Price'] = min(scraped_df['Yahoo Price'], scraped_df['Rakuten Price'])
-            out_df['Min Link'] = scraped_df['Rakuten Link'] if scraped_df['Yahoo Price'] > scraped_df['Rakuten Price'] else scraped_df['Yahoo Link']
+            # Handle missing prices and links by filling NaNs with placeholders (if necessary)
+            out_df['Yahoo Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
+            out_df['Rakuten Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
+            out_df['Yahoo Link'].fillna("No link", inplace=True)  # Placeholder for missing links
+            out_df['Rakuten Link'].fillna("No link", inplace=True)  # Placeholder for missing links
 
+            # Calculate the minimum price and select the corresponding link
+            out_df['Min Price'] = out_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
+            out_df['Min Link'] = out_df.apply(
+                lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
+                axis=1
+            )
+
+            # Adjust the DataFrame index to start from 1
             out_df.index = out_df.index + 1
+            
+            # Dynamically calculate the table height
             height = min(len(out_df) * 35 + 38, 800)
-            # st.dataframe(out_df, use_container_width=True, height=height, key="result")
-            st.dataframe(out_df, 
-                         use_container_width=True, 
-                         height=height, 
-                         key="result",
-                         column_config = {
-                             "Min Link" : st.column_config.LinkColumn()
-                         }
-                )
-        except FileNotFoundError:
-            st.warning("スクレイピングされたデータはまだない。")
+            
+            # Display the dataframe in Streamlit with column configuration for the "Min Link" column
+            st.dataframe(
+                out_df, 
+                use_container_width=True, 
+                height=height, 
+                key="result",
+                column_config={
+                    "Min Link": st.column_config.LinkColumn()  # Ensures that 'Min Link' is clickable
+                }
+            )
+
+        except Exception as e:
+            st.error(f"予期しないエラーが発生しました: {str(e)}")
+
+
 
     def download_excel(self):
         # try:
