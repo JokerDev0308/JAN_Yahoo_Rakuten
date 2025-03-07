@@ -11,6 +11,6 @@ WAITING = False
 CURRENT_USER = None
 LOGIN_STATE = {}
 
-JAN_COLUMNS = ['JAN', 'price', 'Yahoo! Link', 'Rakuten Link']
-SCRAPED_COLUMNS = ['JAN', 'price', 'Yahoo! Price', 'Rakuten Price', 'datetime']
-OUTPUT_COLUMNS = ['JAN', 'price', 'Yahoo! Price', 'Rakuten Price', 'Min Price', 'Min Link', 'datetime']
+JAN_COLUMNS = ['JAN', 'price', 'Yahoo Link', 'Rakuten Link']
+SCRAPED_COLUMNS = ['JAN', 'price', 'Yahoo Price', 'Rakuten Price', 'datetime']
+OUTPUT_COLUMNS = ['JAN', 'price', 'Yahoo Price', 'Rakuten Price', 'Min Price', 'Min Link', 'datetime']

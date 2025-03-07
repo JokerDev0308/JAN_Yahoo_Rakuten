@@ -150,8 +150,8 @@ class PriceScraperUI:
                 if col in out_df.columns:
                     out_df[col] = scraped_df[col]
 
-            out_df['Min Price'] = min(scraped_df['Yahoo! Price'], scraped_df['Rakuten Price'])
-            out_df['Min Link'] = scraped_df['Rakuten Link'] if scraped_df['Yahoo! Price'] > scraped_df['Rakuten Price'] else scraped_df['Yahoo! Link']
+            out_df['Min Price'] = min(scraped_df['Yahoo Price'], scraped_df['Rakuten Price'])
+            out_df['Min Link'] = scraped_df['Rakuten Link'] if scraped_df['Yahoo Price'] > scraped_df['Rakuten Price'] else scraped_df['Yahoo Link']
 
             out_df.index = out_df.index + 1
             height = min(len(out_df) * 35 + 38, 800)
@@ -170,8 +170,8 @@ class PriceScraperUI:
     def download_excel(self):
         # try:
         #     df = pd.read_excel(config.SCRAPED_XLSX)
-        #     if "Yahoo! Link" in df.columns:
-        #         df.drop(columns=["Yahoo! Link"], inplace=True)
+        #     if "Yahoo Link" in df.columns:
+        #         df.drop(columns=["Yahoo Link"], inplace=True)
 
         #     df = df.rename(columns=column_name_mapping)[ordered_columns]
 
