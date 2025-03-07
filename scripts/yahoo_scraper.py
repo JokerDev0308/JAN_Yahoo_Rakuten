@@ -35,12 +35,13 @@ class YahooScraper:
     def _search_by_jan(self, jan_code):
         """Helper method to search and find lowest price by JAN code"""
         try:
-            print(jan_code)
             self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
             
-            items = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".LoopList__item"))
+            WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
             )
+
+            items = item.find_elements(By.CSS_SELECTOR, ".LoopList__item")
 
             min_price = float('inf')
             min_price_link = None
@@ -49,7 +50,7 @@ class YahooScraper:
                 price = self._extract_price_from_item(item)
                 if price and price < min_price:
                     link = item.find_element(By.CSS_SELECTOR, 
-                        "a.SearchResult_SearchResult__cheapestButton__SFFlT")
+                        "SearchResult_SearchResult__cheapestButton__SFFlT")
                     if link:
                         min_price = price
                         min_price_link = link

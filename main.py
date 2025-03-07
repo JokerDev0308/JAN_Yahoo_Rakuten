@@ -12,16 +12,6 @@ from typing import Optional, Dict, Any
 import numpy as np
 import re
 
-def clean_price(price_str):
-    # Remove non-numeric characters, keeping only digits and period (.)
-    cleaned_price = re.sub(r'[^\d.]', '', price_str)
-    
-    # If the cleaned string is empty, return a default value (e.g., 0)
-    if cleaned_price == "":
-        return "N/A"
-    
-    return float(cleaned_price)
-
 class PriceScraper:
     def __init__(self):
         self.df: Optional[pd.DataFrame] = None
@@ -81,7 +71,7 @@ class PriceScraper:
 
         # Handle Yahoo product price and URL, default to None if not available
         if yahoo_product != "N/A":
-            yahoo_price = clean_price(yahoo_product.get("price", "N/A"))
+            yahoo_price = yahoo_product.get("price", "N/A")
             yahoo_url = yahoo_product.get("url", "N/A")
         else:
             yahoo_price = "N/A"
