@@ -151,10 +151,10 @@ class PriceScraperUI:
                 scraped_df = pd.read_excel(config.SCRAPED_XLSX)
             except FileNotFoundError:
                 st.warning("スクレイピングされたデータはまだない。")
-                return
+                return out_df
             except EmptyDataError:
                 st.warning("Excelファイルにデータが含まれていません。")
-                return
+                return out_df
             
             # Copy necessary columns from scraped_df to out_df
             out_df['JAN（マスタ）'] = scraped_df['JAN']
@@ -205,6 +205,7 @@ class PriceScraperUI:
 
         except Exception as e:
             st.error(f"予期しないエラーが発生しました: {str(e)}")
+
 
     def download_excel(self):
         try:
