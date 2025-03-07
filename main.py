@@ -29,7 +29,7 @@ class PriceScraper:
         self.rakuten_scraper = RakutenScraper()
         self.batch_size = 10  # Configurable batch size for saving
 
-    def load_data(self) -> None:
+    def load_data(self):
         """Load JAN codes and prices from CSV file and update the output DataFrame if necessary."""
         
         try:
