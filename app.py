@@ -36,9 +36,7 @@ st.set_page_config(
 class PriceScraperUI:
     def __init__(self):
         self.initialized = False
-        self.out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
-
-
+        
         if 'logged_in' not in st.session_state:
             st.session_state['logged_in'] = False
 
@@ -144,8 +142,9 @@ class PriceScraperUI:
         file_path.unlink()
 
 
-    def display_main_content(self):
+    def result_df(self):
         try:            
+            out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
             # Read the scraped Excel file
             try:
                 scraped_df = pd.read_excel(config.SCRAPED_XLSX)
@@ -156,11 +155,11 @@ class PriceScraperUI:
                 st.warning("Excelファイルにデータが含まれていません。")
                 return
             
-            # Copy necessary columns from scraped_df to self.out_df
-            self.out_df['JAN（マスタ）'] = scraped_df['JAN']
-            self.out_df['価格（マスタ）'] = scraped_df['price']
-            self.out_df['yahoo_実質価格'] = scraped_df['Yahoo Price']
-            self.out_df['楽天_実質価格'] = scraped_df['Rakuten Price']
+            # Copy necessary columns from scraped_df to out_df
+            out_df['JAN（マスタ）'] = scraped_df['JAN']
+            out_df['価格（マスタ）'] = scraped_df['price']
+            out_df['yahoo_実質価格'] = scraped_df['Yahoo Price']
+            out_df['楽天_実質価格'] = scraped_df['Rakuten Price']
             
             # Handle missing prices by filling NaN values with 'inf'
             scraped_df['Yahoo Price'] = scraped_df['Yahoo Price'].fillna(float('inf'))
@@ -168,23 +167,33 @@ class PriceScraperUI:
 
             # Calculate the minimum price and select the corresponding link
             min_price = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
-            self.out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - min_price
-            self.out_df['対象リンク（Y!と楽の安い方）'] = scraped_df.apply(
+            out_df['価格差（マスタ価格‐Y!と楽の安い方）'] = scraped_df['price'] - min_price
+            out_df['対象リンク（Y!と楽の安い方）'] = scraped_df.apply(
                 lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
                 axis=1
             )
 
-            self.out_df['データ取得時間（Y!と楽の安い方）'] = scraped_df['datetime']
+            out_df['データ取得時間（Y!と楽の安い方）'] = scraped_df['datetime']
 
             # Adjust the DataFrame index to start from 1
-            self.out_df.index = self.out_df.index + 1
+            out_df.index = out_df.index + 1
             
+            return out_df
+            
+
+        except Exception as e:
+            st.error(f"予期しないエラーが発生しました: {str(e)}")
+
+
+    def display_main_content(self):
+        try:            
+            df = self.result_df()            
             # Dynamically calculate the table height
-            height = min(len(self.out_df) * 35 + 38, 800)
+            height = min(len(df) * 35 + 38, 800)
             
             # Display the dataframe in Streamlit with column configuration for the "Min Link" column
             st.dataframe(
-                self.out_df, 
+                df, 
                 use_container_width=True, 
                 height=height, 
                 key="result",
@@ -198,8 +207,9 @@ class PriceScraperUI:
 
     def download_excel(self):
         try:
+            df = self.result_df()
             temp_file_path = "/tmp/output.xlsx"
-            self.out_df.to_excel(temp_file_path, index=False)
+            df.to_excel(temp_file_path, index=False)
 
             with open(temp_file_path, "rb") as file:
                 st.download_button(
