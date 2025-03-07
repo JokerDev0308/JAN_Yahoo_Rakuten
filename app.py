@@ -212,8 +212,9 @@ class PriceScraperUI:
 
     def download_excel(self):
         try:
-            df:pd.DataFrame = self.result_df()
-            if not df.empty():
+            if Path(config.SCRAPED_XLSX).exists():
+                df:pd.DataFrame = self.result_df()
+
                 temp_file_path = "/tmp/output.xlsx"
                 df.to_excel(temp_file_path, index=False)
 
