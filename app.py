@@ -3,6 +3,7 @@ from pandas.errors import EmptyDataError
 import pandas as pd
 import config
 import os
+from datetime import datetime
 from pathlib import Path
 from session_manager import SessionManager
 import config
@@ -215,7 +216,7 @@ class PriceScraperUI:
                 st.download_button(
                     label="ダウンロード",
                     data=file,
-                    file_name="output.xlsx",
+                    file_name=f"データ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}).xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True
                 )
