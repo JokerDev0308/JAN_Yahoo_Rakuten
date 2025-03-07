@@ -151,10 +151,10 @@ class PriceScraperUI:
                 scraped_df = pd.read_excel(config.SCRAPED_XLSX)
             except FileNotFoundError:
                 st.warning("スクレイピングされたデータはまだない。")
-                return out_df
+                return out_df.empty()
             except EmptyDataError:
                 st.warning("Excelファイルにデータが含まれていません。")
-                return out_df
+                return out_df.empty()
             
             # Copy necessary columns from scraped_df to out_df
             out_df['JAN（マスタ）'] = scraped_df['JAN']
