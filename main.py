@@ -4,6 +4,7 @@ from webdriver_manager import WebDriverManager
 from scripts.yahoo_scraper import YahooScraper
 from scripts.rakuten_scraper import RakutenScraper
 import config 
+from pathlib import Path
 import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -32,9 +33,14 @@ class PriceScraper:
         """Load JAN codes and prices from CSV file and update the output DataFrame if necessary."""
         
         try:
-            # Read the CSV and Excel files
+            # Read the CSV file
             jan_df = pd.read_csv(config.JANCODE_SCV)
-            out_df = pd.read_excel(config.OUTPUT_XLSX)
+            
+            if Path(config.OUTPUT_XLSX).exists():
+                out_df = pd.read_excel(config.OUTPUT_XLSX)
+            else:
+                self.df = jan_df
+                return
 
             # Ensure 'JAN' and 'price' columns exist in both dataframes
             if 'JAN' not in jan_df.columns or 'price' not in jan_df.columns:
