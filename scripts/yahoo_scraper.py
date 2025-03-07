@@ -13,8 +13,8 @@ class YahooScraper:
     def __init__(self):
         self.driver = WebDriverManager.get_driver("yahoo")
 
-    def scrape_price(self, jan_code, url=None):
-        print("======yyyy========", url, url == "nan" , url == "N/A" , not url , url == None )
+    def scrape_price(self, jan_code, url):
+        print("======yyyy========", url, url == "nan" , url == "N/A" , not url , url == None, len(url) == 0 )
         """
         Scrape price information from Yahoo Shopping.
         Returns a dictionary with 'url' and 'price', or 'N/A' if scraping fails.
