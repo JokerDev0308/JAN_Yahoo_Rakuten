@@ -151,13 +151,13 @@ class PriceScraperUI:
                 if Path(config.SCRAPED_XLSX):
                     scraped_df = pd.read_excel(config.SCRAPED_XLSX)
                 else:
-                    return out_df.empty()
+                    return out_df
             except FileNotFoundError:
                 st.warning("スクレイピングされたデータはまだない。")
-                return out_df.empty()
+                return out_df
             except EmptyDataError:
                 st.warning("Excelファイルにデータが含まれていません。")
-                return out_df.empty()
+                return out_df
             
             # Copy necessary columns from scraped_df to out_df
             out_df['JAN（マスタ）'] = scraped_df['JAN']
@@ -213,19 +213,20 @@ class PriceScraperUI:
     def download_excel(self):
         try:
             df:pd.DataFrame = self.result_df()
-            temp_file_path = "/tmp/output.xlsx"
-            df.to_excel(temp_file_path, index=False)
+            if not df.empty():
+                temp_file_path = "/tmp/output.xlsx"
+                df.to_excel(temp_file_path, index=False)
 
-            with open(temp_file_path, "rb") as file:
-                st.download_button(
-                    label="ダウンロード",
-                    data=file,
-                    file_name=f"データ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}).xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
+                with open(temp_file_path, "rb") as file:
+                    st.download_button(
+                        label="ダウンロード",
+                        data=file,
+                        file_name=f"データ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}).xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True
+                    )
 
-            os.remove(temp_file_path)
+                os.remove(temp_file_path)
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
