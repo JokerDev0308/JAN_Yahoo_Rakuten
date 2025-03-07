@@ -33,11 +33,21 @@ class PriceScraper:
         """Load JAN codes and prices from CSV file and update the output DataFrame if necessary."""
         
         try:
-            # Read the CSV file
-            jan_df = pd.read_csv(config.JANCODE_SCV)
-            
+            # Read the CSV file with appropriate data types
+            jan_df = pd.DataFrame(config.JAN_COLUMNS)
+            out_df = pd.DataFrame(config.OUTPUT_COLUMNS)
+
+            if Path(config.JANCODE_SCV).exists():
+                saved_jan_df = pd.read_csv(config.JANCODE_SCV)
+                for col in jan_df:
+                    if col in saved_jan_df:
+                        jan_df[col] = saved_jan_df[col].astype(str)
+
             if Path(config.SCRAPED_XLSX).exists():
-                out_df = pd.read_excel(config.SCRAPED_XLSX)
+                saved_out_df = pd.read_excel(config.SCRAPED_XLSX)
+                for col in out_df:
+                    if col in saved_out_df:
+                        out_df[col] = saved_out_df[col].astype(str)
             else:
                 self.df = jan_df
                 self.save_results()
