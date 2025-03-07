@@ -29,19 +29,22 @@ class RakutenScraper:
     def __init__(self):
         self.driver = WebDriverManager.get_driver("rakuten")
 
-    def scrape_price(self, jan_code):
+    def scrape_price(self, jan_code, saved_link):
         try:
-            # Navigate to the product search page
-            url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
-            self.driver.get(url)
-            
-            # Wait for the button that leads to the best shop link to load
-            button = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
-            )
-            
-            # Retrieve the link to the best shop
-            link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
+            if saved_link == None or saved_link == "N/A":
+                # Navigate to the product search page
+                url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
+                self.driver.get(url)
+                
+                # Wait for the button that leads to the best shop link to load
+                button = WebDriverWait(self.driver, TIMEOUT).until(
+                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
+                )
+                
+                # Retrieve the link to the best shop
+                link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
+            else:
+                link = saved_link
 
             # Navigate to the link of the best shop
             self.driver.get(link)
@@ -63,7 +66,7 @@ class RakutenScraper:
 
             result_price = cleaned_screen_price - cleaned_ship_price  # If you're including shipping, sum them.
 
-            return {"price":result_price, "url":url}
+            return {"price":result_price, "url":link}
 
         except Exception as e:
             print(f"Error occurred: {e}")

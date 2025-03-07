@@ -31,26 +31,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Column name mappings
-column_name_mapping = {
-    'JAN': 'JAN（マスタ）',
-    'price': '価格（マスタ）',
-    'Yahoo Price': 'yahoo_実質価格',
-    'Rakuten Price': '楽天_実質価格',
-    'Price Difference': '価格差（マスタ価格‐Y!と楽の安い方）',
-    'Min Price URL': '対象リンク（Y!と楽の安い方）',
-    'datetime': 'データ取得時間（Y!と楽の安い方）'
-}
-
-ordered_columns = [
-    'JAN（マスタ）',
-    '価格（マスタ）',
-    'yahoo_実質価格',
-    '楽天_実質価格',
-    '価格差（マスタ価格‐Y!と楽の安い方）',
-    '対象リンク（Y!と楽の安い方）',
-    'データ取得時間（Y!と楽の安い方）'
-]
 
 # Main application class
 class PriceScraperUI:
@@ -114,10 +94,17 @@ class PriceScraperUI:
                         st.error("ユーザー名またはパスワードが無効です。")
 
 
-    def _handle_file_upload(self):
+    def JANCODE_file_upload(self):
+        jan_df = pd.DataFrame(columns=config.JAN_COLUMNS)
+
         uploaded_file = st.file_uploader("JANコードを含むCSVファイルを選択", type="csv")
         if uploaded_file is not None:
-            jan_df = pd.read_csv(uploaded_file)
+            df = pd.read_csv(uploaded_file)
+            for col in df.columns:
+                if col in jan_df.columns:
+                    jan_df[col] = df[col].astype(str)
+
+
             st.write("JANコードが読み込まれました:", len(jan_df))
             jan_df.index = jan_df.index + 1
             height = min(len(jan_df) * 35 + 38, 800)
@@ -156,48 +143,54 @@ class PriceScraperUI:
 
     def display_main_content(self):
         try:
-            df = pd.read_excel(config.OUTPUT_XLSX)
-            if "Yahoo! Link" in df.columns:
-                df.drop(columns=["Yahoo! Link"], inplace=True)
-            
-            df = df.rename(columns=column_name_mapping)[ordered_columns]
-            df.index = df.index + 1
-            height = min(len(df) * 35 + 38, 800)
-            # st.dataframe(df, use_container_width=True, height=height, key="result")
-            st.dataframe(df, 
+            out_df = pd.DataFrame(columns=config.OUTPUT_COLUMNS)
+            scraped_df = pd.read_excel(config.SCRAPED_XLSX)
+
+            for col in scraped_df.columns:
+                if col in out_df.columns:
+                    out_df[col] = scraped_df[col]
+
+            out_df['Min Price'] = min(scraped_df['Yahoo! Price'], scraped_df['Rakuten Price'])
+            out_df['Min Link'] = scraped_df['Rakuten Link'] if scraped_df['Yahoo! Price'] > scraped_df['Rakuten Price'] else scraped_df['Yahoo! Link']
+
+            out_df.index = out_df.index + 1
+            height = min(len(out_df) * 35 + 38, 800)
+            # st.dataframe(out_df, use_container_width=True, height=height, key="result")
+            st.dataframe(out_df, 
                          use_container_width=True, 
                          height=height, 
                          key="result",
                          column_config = {
-                             "対象リンク（Y!と楽の安い方）" : st.column_config.LinkColumn()
+                             "Min Link" : st.column_config.LinkColumn()
                          }
                 )
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
 
     def download_excel(self):
-        try:
-            df = pd.read_excel(config.OUTPUT_XLSX)
-            if "Yahoo! Link" in df.columns:
-                df.drop(columns=["Yahoo! Link"], inplace=True)
+        # try:
+        #     df = pd.read_excel(config.SCRAPED_XLSX)
+        #     if "Yahoo! Link" in df.columns:
+        #         df.drop(columns=["Yahoo! Link"], inplace=True)
 
-            df = df.rename(columns=column_name_mapping)[ordered_columns]
+        #     df = df.rename(columns=column_name_mapping)[ordered_columns]
 
-            temp_file_path = "/tmp/scraped_data_updated.xlsx"
-            df.to_excel(temp_file_path, index=False)
+        #     temp_file_path = "/tmp/output.xlsx"
+        #     df.to_excel(temp_file_path, index=False)
 
-            with open(temp_file_path, "rb") as file:
-                st.download_button(
-                    label="ダウンロード",
-                    data=file,
-                    file_name="scraped_data_updated.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
+        #     with open(temp_file_path, "rb") as file:
+        #         st.download_button(
+        #             label="ダウンロード",
+        #             data=file,
+        #             file_name="output.xlsx",
+        #             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        #             use_container_width=True
+        #         )
 
-            os.remove(temp_file_path)
-        except FileNotFoundError:
-            st.warning("スクレイピングされたデータはまだない。")
+        #     os.remove(temp_file_path)
+        # except FileNotFoundError:
+        #     st.warning("スクレイピングされたデータはまだない。")
+        print('comming soon')
 
     
     def logout(self):
@@ -216,7 +209,7 @@ class PriceScraperUI:
             with tab1:
                 self.display_main_content()
             with tab2:
-                self._handle_file_upload()
+                self.JANCODE_file_upload()
         else:
             self.show_login_modal()
 
