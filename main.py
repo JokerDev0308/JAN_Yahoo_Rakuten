@@ -34,8 +34,8 @@ class PriceScraper:
         
         try:
             # Read the CSV file with appropriate data types
-            jan_df = pd.DataFrame(config.JAN_COLUMNS)
-            out_df = pd.DataFrame(config.SCRAPED_COLUMNS)
+            jan_df = pd.DataFrame(columns = config.JAN_COLUMNS)
+            scraped_df = pd.DataFrame(columns = config.SCRAPED_COLUMNS)
 
             if Path(config.JANCODE_SCV).exists():
                 saved_jan_df = pd.read_csv(config.JANCODE_SCV)
@@ -44,10 +44,10 @@ class PriceScraper:
                         jan_df[col] = saved_jan_df[col].astype(str)
 
             if Path(config.SCRAPED_XLSX).exists():
-                saved_out_df = pd.read_excel(config.SCRAPED_XLSX)
-                for col in out_df:
-                    if col in saved_out_df:
-                        out_df[col] = saved_out_df[col].astype(str)
+                saved_scraped_df = pd.read_excel(config.SCRAPED_XLSX)
+                for col in scraped_df:
+                    if col in saved_scraped_df:
+                        scraped_df[col] = saved_scraped_df[col].astype(str)
             else:
                 self.df = jan_df
                 self.save_results()
@@ -58,15 +58,15 @@ class PriceScraper:
                 print("CSV file is missing required 'JAN' or 'price' columns.")
                 return
             
-            if 'JAN' not in out_df.columns or 'price' not in out_df.columns:
+            if 'JAN' not in scraped_df.columns or 'price' not in scraped_df.columns:
                 print("Excel file is missing required 'JAN' or 'price' columns.")
                 return
 
             # Ensure the JAN columns match in both dataframes
-            if jan_df["JAN"].equals(out_df["JAN"]):
-                if not jan_df["price"].equals(out_df["price"]):
-                    out_df["price"] = jan_df["price"]
-                self.df = out_df
+            if jan_df["JAN"].equals(scraped_df["JAN"]):
+                if not jan_df["price"].equals(scraped_df["price"]):
+                    scraped_df["price"] = jan_df["price"]
+                self.df = scraped_df
             else:
                 self.df = jan_df
 
