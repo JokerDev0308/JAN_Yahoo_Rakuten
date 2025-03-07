@@ -162,14 +162,14 @@ class PriceScraperUI:
                     out_df[col] = scraped_df[col]
 
             # Handle missing prices and links by filling NaNs with placeholders (if necessary)
-            out_df['Yahoo Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
-            out_df['Rakuten Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
-            out_df['Yahoo Link'].fillna("No link", inplace=True)  # Placeholder for missing links
-            out_df['Rakuten Link'].fillna("No link", inplace=True)  # Placeholder for missing links
+            scraped_df['Yahoo Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
+            scraped_df['Rakuten Price'].fillna(float('inf'), inplace=True)  # Use a large value for missing prices
+            # scraped_df['Yahoo Link'].fillna("No link", inplace=True)  # Placeholder for missing links
+            # scraped_df['Rakuten Link'].fillna("No link", inplace=True)  # Placeholder for missing links
 
             # Calculate the minimum price and select the corresponding link
-            out_df['Min Price'] = out_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
-            out_df['Min Link'] = out_df.apply(
+            out_df['Min Price'] = scraped_df[['Yahoo Price', 'Rakuten Price']].min(axis=1)
+            out_df['Min Link'] = scraped_df.apply(
                 lambda row: row['Rakuten Link'] if row['Rakuten Price'] < row['Yahoo Price'] else row['Yahoo Link'],
                 axis=1
             )
