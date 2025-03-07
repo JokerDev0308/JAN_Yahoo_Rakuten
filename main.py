@@ -35,7 +35,7 @@ class PriceScraper:
         try:
             # Read the CSV file with appropriate data types
             jan_df = pd.DataFrame(config.JAN_COLUMNS)
-            out_df = pd.DataFrame(config.OUTPUT_COLUMNS)
+            out_df = pd.DataFrame(config.SCRAPED_COLUMNS)
 
             if Path(config.JANCODE_SCV).exists():
                 saved_jan_df = pd.read_csv(config.JANCODE_SCV)
