@@ -2,15 +2,13 @@
 
 [server]
 # Specify the port for Streamlit to run on
-port = 80
+port = 8501
 # Allow access to Streamlit app from any IP address (useful for VPS setup)
 headless = true
 # Set the address to allow connections from any host
 address = "0.0.0.0"
 
-[browser]
-# Disable the auto-opening of a new tab in the browser when running the app
-serverAddress = "162.43.90.7"
+
 
 [theme]
 base="dark"
