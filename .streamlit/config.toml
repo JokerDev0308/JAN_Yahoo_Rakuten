@@ -8,7 +8,9 @@ headless = true
 # Set the address to allow connections from any host
 address = "0.0.0.0"
 
-
+[browser]
+# Disable the auto-opening of a new tab in the browser when running the app
+serverAddress = "162.43.50.71"
 
 [theme]
 base="dark"

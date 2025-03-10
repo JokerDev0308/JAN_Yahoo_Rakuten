@@ -1,0 +1,21 @@
+[Unit]
+Description=Main Scraping Service
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root  
+Group=root 
+WorkingDirectory=/home/ScrapingServer/JAN_Yahoo_Rakuten
+ExecStart=/bin/bash -c 'cd /home/ScrapingServer/JAN_Yahoo_Rakuten && source .venv/bin/activate && python3 main.py'
+Environment="PATH=/home/ScrapingServer/JAN_Yahoo_Rakuten/.venv/bin:$PATH"
+Environment="VIRTUAL_ENV=/home/ScrapingServer/JAN_Yahoo_Rakuten/.venv"
+Restart=always
+RestartSec=10
+TimeoutStartSec=60
+StandardOutput=append:/var/log/scraper.log
+StandardError=append:/var/log/scraper.error.log
+
+[Install]
+WantedBy=multi-user.target

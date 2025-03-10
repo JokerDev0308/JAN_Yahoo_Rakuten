@@ -142,7 +142,6 @@ class PriceScraper:
                 if (index + 1) % self.batch_size == 0 or (index + 1) == total_records:
                     self.save_results()
                     self.save_yahoo_urls()
-                    WebDriverManager.close_all()
                     sleep(3)
 
                 sleep(1)  # Rate limiting
