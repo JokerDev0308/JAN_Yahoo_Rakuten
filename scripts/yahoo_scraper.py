@@ -69,7 +69,7 @@ class YahooScraper:
             logger.error(f"Search by JAN failed: {e}")
             return None
 
-    def _scrape_from_url(self, url, fallback_price=None):
+    def _scrape_from_url(self, url):
         """Helper method to scrape price from a specific URL"""
         try:
             self.driver.get(url)
@@ -85,14 +85,14 @@ class YahooScraper:
             
             return {
                 'url': url,
-                'price': str(fallback_price) if fallback_price else "N/A"
+                'price': "N/A"
             }
 
         except Exception as e:
             logger.error(f"URL scraping failed: {e}")
             return {
                 'url': url,
-                'price': str(fallback_price) if fallback_price else "N/A"
+                'price': "N/A"
             }
 
     def close(self):
