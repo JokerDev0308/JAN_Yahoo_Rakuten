@@ -195,6 +195,7 @@ class PriceScraperUI:
             # Dynamically calculate the table height
             height = min(len(df) * 35 + 38, 800)
             
+            st.subheader('Chatwork ID: tk377502080', help='何か質問がありましたら、こちらでお知らせいただけますでしょうか？')
             # Display the dataframe in Streamlit with column configuration for the "Min Link" column
             st.dataframe(
                 df, 

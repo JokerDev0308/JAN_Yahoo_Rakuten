@@ -35,7 +35,8 @@ class YahooScraper:
     def _search_by_jan(self, jan_code):
         """Helper method to search and find lowest price by JAN code"""
         try:
-            self.driver.get(f"https://shopping.yahoo.co.jp/search?p={jan_code}")
+            search_url = f"https://shopping.yahoo.co.jp/search?p={jan_code}"
+            self.driver.get(search_url)
             
             link_item = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
@@ -52,8 +53,8 @@ class YahooScraper:
                     if price and price < min_price:
                         min_price = price
                                 
-                logger.info( {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None})
-                return {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': None}
+                logger.info( {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': search_url})
+                return {'price': str(min_price) if min_price != float('inf') else "N/A", 'url': search_url}
 
         except Exception as e:
             logger.error(f"Search by JAN failed: {e}")
