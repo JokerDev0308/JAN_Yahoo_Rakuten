@@ -244,7 +244,7 @@ class PriceScraperUI:
         # if session in config.LOGIN_STATE and config.LOGIN_STATE[session]:
         if st.session_state.logged_in:
             self.setup_sidebar()
-            st.subheader('何か問題がございましたら、こちらでお知らせいただけますようお願い申し上げます。', help='Chatwork ID: tk377502080, Line ID: joker03081991')
+            st.subheader('Chatwork ID: tk377502080, Line ID: joker03081991', help='何か問題がございましたら、こちらでお知らせいただけますようお願い申し上げます。')
 
             tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
             with tab1:
