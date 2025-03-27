@@ -109,12 +109,7 @@ class YahooScraper:
                 'price': "N/A"
             }
 
-        except Exception as e:
-            logger.error(f"URL scraping failed: {e}")
-            return {
-                'url': url,
-                'price': "N/A"
-            }
+        
 
     def close(self):
         """Close the web driver"""
