@@ -104,7 +104,7 @@ class YahooScraper:
             }
 
         except Exception as e:
-            logger.error(f"URL scraping failed: {e}")
+            logger.error(f"URL scraping failed: {e.message}")
             return {
                 'url': url,
                 'price': "N/A"
