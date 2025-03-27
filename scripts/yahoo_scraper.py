@@ -53,20 +53,7 @@ class YahooScraper:
             if link_items and len(link_items) > 0:
                 cheapest_link = link_items[0].get_attribute('href')
                 logger.info(f"Cheapest link: {cheapest_link}")
-                # return self._scrape_from_url(cheapest_link)
-
-                self.driver.get(f"{cheapest_link}?sc_i=shopping-pc-web-result-item-rsltlst-cmp")
-                price_elements  = WebDriverWait(self.driver, 30).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-                )
-
-                logger.info(f"Price elements: {len(price_elements)}")
-
-                return {
-                    'url': cheapest_link,
-                    'price': price_elements[0].text
-                }
-
+                return self._scrape_from_url(cheapest_link)
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
                 min_price = float('inf')
@@ -95,21 +82,20 @@ class YahooScraper:
     def _scrape_from_url(self, url):
         """Helper method to scrape price from a specific URL"""
         try:
-            self.driver.get(f"{url}?sc_i=shopping-pc-web-result-item-rsltlst-cmp")
-            price_elements  = WebDriverWait(self.driver, 30).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+            self.driver.get(url)
+            cheapest_result  = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
             )
 
-            
-            # # price_elements = cheapest_result.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-            # if not price_elements:
-            #     logger.warning("No price elements found. Check the CSS selector or webpage structure.")
-            #     return {
-            #         'url': url,
-            #         'price': "N/A"
-            #     }
+            price_elements = cheapest_result[0].find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+            if not price_elements:
+                logger.warning("No price elements found. Check the CSS selector or webpage structure.")
+                return {
+                    'url': url,
+                    'price': "N/A"
+                }
 
-            logger.info(f"Price elements: {len(price_elements)}")
+            logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
 
             return {
                 'url': url,
