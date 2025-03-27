@@ -82,7 +82,7 @@ class YahooScraper:
     def _scrape_from_url(self, url):
         """Helper method to scrape price from a specific URL"""
         try:
-            self.driver.get(url)
+            self.driver.get(f"{url}?sc_i=shopping-pc-web-result-item-rsltlst-cmp")
             price_elements  = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
