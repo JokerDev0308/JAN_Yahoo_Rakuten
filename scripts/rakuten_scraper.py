@@ -31,20 +31,31 @@ class RakutenScraper:
 
     def scrape_price(self, jan_code, saved_link):
         try:
-            if saved_link == 'nan' or saved_link == "N/A" or not saved_link:
-                # Navigate to the product search page
-                url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
-                self.driver.get(url)
+            # if saved_link == 'nan' or saved_link == "N/A" or not saved_link:
+            #     # Navigate to the product search page
+            #     url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
+            #     self.driver.get(url)
                 
-                # Wait for the button that leads to the best shop link to load
-                button = WebDriverWait(self.driver, TIMEOUT).until(
-                    EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
-                )
+            #     # Wait for the button that leads to the best shop link to load
+            #     button = WebDriverWait(self.driver, TIMEOUT).until(
+            #         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
+            #     )
                 
-                # Retrieve the link to the best shop
-                link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
-            else:
-                link = saved_link
+            #     # Retrieve the link to the best shop
+            #     link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
+            # else:
+            #     link = saved_link
+
+            url = f"https://search.rakuten.co.jp/search/mall/{jan_code}/?s=11&used=0"
+            self.driver.get(url)
+            
+            # Wait for the button that leads to the best shop link to load
+            button = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.dui-button.-bestshop.-fluid"))
+            )
+            
+            # Retrieve the link to the best shop
+            link = button[0].get_attribute('href')  # Corrected from getget_attribute to get_attribute
 
             # Navigate to the link of the best shop
             self.driver.get(link)

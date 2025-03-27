@@ -19,14 +19,16 @@ class YahooScraper:
         Returns a dictionary with 'url' and 'price', or 'N/A' if scraping fails.
         """
         try:
-            # If no URL provided, search by JAN code
-            if url == "nan" or url == "N/A" or not url  :
-                logger.info(f"go to jan")
-                return self._search_by_jan(jan_code)
+            # # If no URL provided, search by JAN code
+            # if url == "nan" or url == "N/A" or not url  :
+            #     logger.info(f"go to jan")
+            #     return self._search_by_jan(jan_code)
             
-            # Direct URL scraping
-            logger.info(f"go to Direct url")
-            return self._scrape_from_url(url)
+            # # Direct URL scraping
+            # logger.info(f"go to Direct url")
+            # return self._scrape_from_url(url)
+
+            return self._search_by_jan(jan_code)
 
         except Exception as e:
             logger.error(f"Scraping failed for JAN {jan_code}: {e}")
@@ -38,12 +40,18 @@ class YahooScraper:
             search_url = f"https://shopping.yahoo.co.jp/search?p={jan_code}"
             self.driver.get(search_url)
             
-            link_item = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResult_SearchResult__cheapestButton__SFFlT"))
+            # link_item = WebDriverWait(self.driver, TIMEOUT).until(
+            #     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResults_SearchResults__page__OJhQP"))
+            # )
+
+            WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".SearchResults_SearchResults__page__OJhQP"))
             )
 
-            if link_item and len(link_item) > 0:
-                cheapest_link = link_item[0].get_attribute('href')
+            link_items = self.driver.find_elements(By.CSS_SELECTOR, '.SearchResult_SearchResult__cheapestButton__SFFlT')
+
+            if link_items and len(link_items) > 0:
+                cheapest_link = link_items[0].get_attribute('href')
                 return self._scrape_from_url(cheapest_link)
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
