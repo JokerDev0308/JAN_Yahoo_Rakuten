@@ -89,19 +89,19 @@ class YahooScraper:
 
             logger.info(f"Cheapest result: {cheapest_result[0].text}")
 
-            price_elements = cheapest_result[0].find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-            if not price_elements:
-                logger.warning("No price elements found. Check the CSS selector or webpage structure.")
-                return {
-                    'url': url,
-                    'price': "N/A"
-                }
+            # price_elements = cheapest_result[0].find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+            # if not price_elements:
+            #     logger.warning("No price elements found. Check the CSS selector or webpage structure.")
+            #     return {
+            #         'url': url,
+            #         'price': "N/A"
+            #     }
 
-            logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
+            # logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
 
             return {
                 'url': url,
-                'price': price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
+                'price': 0
             }
 
         except Exception as e:
