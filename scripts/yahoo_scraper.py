@@ -53,7 +53,20 @@ class YahooScraper:
             if link_items and len(link_items) > 0:
                 cheapest_link = link_items[0].get_attribute('href')
                 logger.info(f"Cheapest link: {cheapest_link}")
-                return self._scrape_from_url(cheapest_link)
+                # return self._scrape_from_url(cheapest_link)
+
+                self.driver.get(f"{cheapest_link}?sc_i=shopping-pc-web-result-item-rsltlst-cmp")
+                price_elements  = WebDriverWait(self.driver, 30).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                )
+
+                logger.info(f"Price elements: {len(price_elements)}")
+
+                return {
+                    'url': cheapest_link,
+                    'price': price_elements[0].text
+                }
+
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
                 min_price = float('inf')
