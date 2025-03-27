@@ -87,6 +87,8 @@ class YahooScraper:
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
             )
 
+            logger.info(f"Cheapest result: {cheapest_result[0].text}")
+
             price_elements = cheapest_result[0].find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
             if not price_elements:
                 logger.warning("No price elements found. Check the CSS selector or webpage structure.")
