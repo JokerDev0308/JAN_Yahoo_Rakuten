@@ -81,34 +81,34 @@ class YahooScraper:
 
     def _scrape_from_url(self, url):
         """Helper method to scrape price from a specific URL"""
-        # try:
-        self.driver.get(url)
-        price_elements  = WebDriverWait(self.driver, TIMEOUT).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
-        )
+        try:
+            self.driver.get(url)
+            price_elements  = WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+            )
 
-        
-        # price_elements = cheapest_result.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-        if not price_elements:
-            logger.warning("No price elements found. Check the CSS selector or webpage structure.")
+            
+            # # price_elements = cheapest_result.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+            # if not price_elements:
+            #     logger.warning("No price elements found. Check the CSS selector or webpage structure.")
+            #     return {
+            #         'url': url,
+            #         'price': "N/A"
+            #     }
+
+            logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
+
+            return {
+                'url': url,
+                'price': price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
+            }
+
+        except Exception as e:
+            logger.error(f"URL scraping failed: {e}")
             return {
                 'url': url,
                 'price': "N/A"
             }
-
-        logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
-
-        return {
-            'url': url,
-            'price': price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
-        }
-
-        # except Exception as e:
-        #     logger.error(f"URL scraping failed: {e}")
-        #     return {
-        #         'url': url,
-        #         'price': "N/A"
-        #     }
 
         
 
