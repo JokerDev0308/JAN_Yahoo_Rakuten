@@ -37,7 +37,7 @@ class YahooScraper:
     def _search_by_jan(self, jan_code):
         """Helper method to search and find lowest price by JAN code"""
         try:
-            search_url = f"https://shopping.yahoo.co.jp/search?p={jan_code}"
+            search_url = f"https://shopping.yahoo.co.jp/search?used=2&p={jan_code}"
             self.driver.get(search_url)
             
             # link_item = WebDriverWait(self.driver, TIMEOUT).until(
@@ -45,7 +45,7 @@ class YahooScraper:
             # )
 
             WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".SearchResults_SearchResults__page__OJhQP"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#searchResults"))
             )
 
             link_items = self.driver.find_elements(By.CSS_SELECTOR, '.SearchResult_SearchResult__cheapestButton__SFFlT')
@@ -82,9 +82,11 @@ class YahooScraper:
         """Helper method to scrape price from a specific URL"""
         try:
             self.driver.get(url)
-            price_elements = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+            WebDriverWait(self.driver, TIMEOUT).until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
             )
+
+            price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
             
             if price_elements:
                 return {
