@@ -84,21 +84,25 @@ class YahooScraper:
         try:
             self.driver.get(url)
             WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
             )
 
             price_elements = self.driver.find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
+            if not price_elements:
+                logger.warning("No price elements found. Check the CSS selector or webpage structure.")
+
+            logger.info(f"Price elements: {price_elements}")
             
             if price_elements:
                 return {
                     'url': url,
                     'price': price_elements[0].text.translate(str.maketrans("", "", "円,")).strip()
                 }
-            
-            return {
-                'url': url,
-                'price': "N/A"
-            }
+            else:
+                return {
+                    'url': url,
+                    'price': "N/A"
+                }
 
         except Exception as e:
             logger.error(f"URL scraping failed: {e}")
