@@ -84,7 +84,7 @@ class YahooScraper:
         try:
             self.driver.get(url)
             cheapest_result  = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_TabsContents__Idm_Q"))
+                EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
 
             logger.info(f"Cheapest result: {cheapest_result[0].text}")
