@@ -83,7 +83,7 @@ class YahooScraper:
         """Helper method to scrape price from a specific URL"""
         try:
             self.driver.get(f"{url}?sc_i=shopping-pc-web-result-item-rsltlst-cmp")
-            price_elements  = WebDriverWait(self.driver, TIMEOUT).until(
+            price_elements  = WebDriverWait(self.driver, 30).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
             )
 
@@ -104,7 +104,7 @@ class YahooScraper:
             }
 
         except Exception as e:
-            logger.error(f"URL scraping failed: {str(e)}")
+            logger.error(f"URL scraping failed: {e.message}")
             return {
                 'url': url,
                 'price': "N/A"
