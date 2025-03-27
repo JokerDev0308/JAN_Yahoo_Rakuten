@@ -96,7 +96,7 @@ class YahooScraper:
             #         'price': "N/A"
             #     }
 
-            logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
+            logger.info(f"Price elements: {len(price_elements)}")
 
             return {
                 'url': url,
