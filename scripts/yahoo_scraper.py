@@ -45,7 +45,7 @@ class YahooScraper:
             # )
 
             search_result = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "#searchResults"))
+                EC.presence_of_element_located((By.ID, "searchResults"))
             )
 
             link_items = search_result.find_elements(By.CSS_SELECTOR, '.SearchResult_SearchResult__cheapestButton__SFFlT')
@@ -53,12 +53,22 @@ class YahooScraper:
             if link_items and len(link_items) > 0:
                 cheapest_link = link_items[0].get_attribute('href')
                 logger.info(f"Cheapest link: {cheapest_link}")
-                return self._scrape_from_url(cheapest_link)
+
+                self.driver.get(cheapest_link)
+
+                cheapest_result = WebDriverWait(self.driver, TIMEOUT).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
+                    )
+                
+                logger.info(f"Cheapest result: {cheapest_result[0].text}")
+
+                return {'price': cheapest_result[0].text.translate(str.maketrans("", "", "円,")), 'url': cheapest_link}
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
                 min_price = float('inf')
                 for item in items:
-                    price = self._extract_price_from_item(item)
+                    price = item.find_element(By.CSS_SELECTOR, ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV").text
+                    price = float(price.replace(",", ""))
                     if price and price < min_price:
                         min_price = price
                                 
@@ -69,49 +79,6 @@ class YahooScraper:
             logger.error(f"Search by JAN failed: {e}")
             return "N/A"
 
-    def _extract_price_from_item(self, item):
-        """Helper method to extract price from an item element"""
-        try:
-            price_text = item.find_element(By.CSS_SELECTOR, 
-                ".SearchResultItemPrice_SearchResultItemPrice__value__G8pQV").text
-            return int(price_text.translate(str.maketrans("", "", "円,")))
-        except Exception as e:
-            logger.error(f"Search by JAN failed: {e}")
-            return None
-
-    def _scrape_from_url(self, url):
-        """Helper method to scrape price from a specific URL"""
-        try:
-            self.driver.get(url)
-            cheapest_result  = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "style_Item__money__e2mFn"))
-            )
-
-            logger.info(f"Cheapest result")
-
-            # price_elements = cheapest_result[0].find_elements(By.CSS_SELECTOR, ".style_Item__money__e2mFn")
-            # if not price_elements:
-            #     logger.warning("No price elements found. Check the CSS selector or webpage structure.")
-            #     return {
-            #         'url': url,
-            #         'price': "N/A"
-            #     }
-
-            # logger.info(f"Price elements: {[elem.text for elem in price_elements]}")
-
-            return {
-                'url': url,
-                'price': 0
-            }
-
-        except Exception as e:
-            logger.error(f"URL scraping failed: {e}")
-            return {
-                'url': url,
-                'price': "N/A"
-            }
-
-        
 
     def close(self):
         """Close the web driver"""
