@@ -44,14 +44,15 @@ class YahooScraper:
             #     EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".SearchResults_SearchResults__page__OJhQP"))
             # )
 
-            WebDriverWait(self.driver, TIMEOUT).until(
+            search_result = WebDriverWait(self.driver, TIMEOUT).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "#searchResults"))
             )
 
-            link_items = self.driver.find_elements(By.CSS_SELECTOR, '.SearchResult_SearchResult__cheapestButton__SFFlT')
+            link_items = search_result.find_elements(By.CSS_SELECTOR, '.SearchResult_SearchResult__cheapestButton__SFFlT')
 
             if link_items and len(link_items) > 0:
                 cheapest_link = link_items[0].get_attribute('href')
+                logger.info(f"Cheapest link: {cheapest_link}")
                 return self._scrape_from_url(cheapest_link)
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
