@@ -62,7 +62,7 @@ class YahooScraper:
                 
                 logger.info(f"Cheapest result: {cheapest_result.text}")
 
-                return {'price': cheapest_result[0].text.translate(str.maketrans("", "", "円,")), 'url': cheapest_link}
+                return {'price': cheapest_result.text.translate(str.maketrans("", "", "円,")), 'url': cheapest_link}
             else:
                 items = self.driver.find_elements(By.CSS_SELECTOR, ".LoopList__item")
                 min_price = float('inf')
