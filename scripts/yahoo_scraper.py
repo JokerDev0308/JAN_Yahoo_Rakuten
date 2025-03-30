@@ -60,7 +60,7 @@ class YahooScraper:
                         EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                     )
                 
-                logger.info(f"Cheapest result: {cheapest_result[0].text}")
+                logger.info(f"Cheapest result: {cheapest_result.text}")
 
                 return {'price': cheapest_result[0].text.translate(str.maketrans("", "", "円,")), 'url': cheapest_link}
             else:
