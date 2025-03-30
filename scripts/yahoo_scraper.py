@@ -56,7 +56,7 @@ class YahooScraper:
 
                 self.driver.get(cheapest_link)
 
-                cheapest_result = WebDriverWait(self.driver, TIMEOUT).until(
+                cheapest_result = WebDriverWait(self.driver, 30).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, ".style_Item__money__e2mFn"))
                     )
                 
