@@ -59,6 +59,11 @@ class PriceScraperUI:
             if st.button("ログアウト", use_container_width=True):
                 self.logout()
 
+            with open(config.YAHOO_LOGIN_STATE_FILE, 'r') as state_file:
+                login_status = state_file.read()
+
+            st.markdown(f"**Yahooログイン状態:** {login_status}")
+
 
     def show_login_modal(self):
         col1, col2, col3 = st.columns(3)

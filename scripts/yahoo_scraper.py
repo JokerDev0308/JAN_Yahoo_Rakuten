@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from config import TIMEOUT
+from config import TIMEOUT, YAHOO_LOGIN_STATE_FILE
 from webdriver_manager import WebDriverManager
 
 import pickle
@@ -39,10 +39,35 @@ class YahooScraper:
                 self.driver.add_cookie(cookie)
 
             self.driver.refresh()
-            logger.info("✅ Yahoo cookies loaded, logged in session ready.")
+
+            self.login_status()
 
         except Exception as e:
             logger.error(f"Failed to load Yahoo cookies: {e}")
+
+    def login_status(self):
+        """Check if the user is logged in to Yahoo."""
+        try:
+            # Check if login was successful
+            page_source = self.driver.page_source
+
+            stat_msg = "✅ Yahoo クッキーが読み込まれました。"
+
+            # Check for login failure indicators
+            if "ログイン" in page_source or "login" in page_source.lower():
+                stat_msg = '⚠️ Cookie が読み込まれましたが、ログインされていません。セッションが期限切れになっている可能性があります。'
+                logger.warning(stat_msg)               
+
+            else:
+                stat_msg = "✅ Yahoo クッキーが読み込まれ、ログインが確認されました。"
+                logger.info(stat_msg)               
+
+            with open(YAHOO_LOGIN_STATE_FILE, "w") as state_file:
+                    state_file.write(stat_msg)
+
+        except Exception as e:
+            logger.error(f"Error checking login status: {e}")
+            return False
 
 
     def scrape_price(self, jan_code, url):
@@ -51,6 +76,8 @@ class YahooScraper:
         Returns a dictionary with 'url' and 'price', or 'N/A' if scraping fails.
         """
         try:
+
+            self.login_status()
             # # If no URL provided, search by JAN code
             # if url == "nan" or url == "N/A" or not url  :
             #     logger.info(f"go to jan")
