@@ -40,34 +40,12 @@ class YahooScraper:
 
             self.driver.refresh()
 
-            self.login_status()
+            logger.info('✅ Yahoo クッキーが読み込まれ、ログインが確認されました。')
 
         except Exception as e:
             logger.error(f"Failed to load Yahoo cookies: {e}")
 
-    def login_status(self):
-        """Check if the user is logged in to Yahoo."""
-        try:
-            # Check if login was successful
-            page_source = self.driver.page_source
-
-            stat_msg = "✅ Yahoo クッキーが読み込まれました。"
-
-            # Check for login failure indicators
-            if "ログイン" in page_source:
-                stat_msg = '⚠️ Cookie が読み込まれましたが、ログインされていません。セッションが期限切れになっている可能性があります。'
-                logger.warning(stat_msg)               
-
-            else:
-                stat_msg = "✅ Yahoo クッキーが読み込まれ、ログインが確認されました。"
-                logger.info(stat_msg)               
-
-            with open(YAHOO_LOGIN_STATE_FILE, "w") as state_file:
-                    state_file.write(stat_msg)
-
-        except Exception as e:
-            logger.error(f"Error checking login status: {e}")
-            return False
+   
 
 
     def scrape_price(self, jan_code, url):
@@ -77,7 +55,7 @@ class YahooScraper:
         """
         try:
 
-            self.login_status()
+            # self.login_status()
             # # If no URL provided, search by JAN code
             # if url == "nan" or url == "N/A" or not url  :
             #     logger.info(f"go to jan")
