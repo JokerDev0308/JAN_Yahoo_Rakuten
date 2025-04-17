@@ -34,8 +34,8 @@ class YahooScraper:
             with open(cookies_path, "rb") as f:
                 cookies = pickle.load(f)
             for cookie in cookies:
-                if 'expiry' in cookie:
-                    del cookie['expiry']  # optional fix for some versions
+                # if 'expiry' in cookie:
+                #     del cookie['expiry']  # optional fix for some versions
                 self.driver.add_cookie(cookie)
 
             self.driver.refresh()

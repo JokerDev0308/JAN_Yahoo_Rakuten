@@ -1,7 +1,7 @@
 # config.py
 HEADLESS = True  # Set to False if you want to see browser running
 TIMEOUT = 10  # Selenium wait timeout
-CHROMEDRIVER_PATH = "drivers/chromedriver-linux64/chromedriver"
+CHROMEDRIVER_PATH = "drivers/chromedriver.exe"  
 JANCODE_SCV = 'data/jan_codes.csv'
 JANCODE_YH_AFFILI_SCV = 'data/jan_YH_afiil_codes.csv'
 SCRAPED_XLSX = 'data/scraped_prices.xlsx'

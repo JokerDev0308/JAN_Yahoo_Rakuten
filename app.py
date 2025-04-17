@@ -218,10 +218,13 @@ class PriceScraperUI:
         try:
             if Path(config.SCRAPED_XLSX).exists():
                 df:pd.DataFrame = self.result_df()
-
-                temp_file_path = "/tmp/output.xlsx"
+    
+                # Use tempfile to get a proper temporary file path
+                import tempfile
+                temp_file_path = os.path.join(tempfile.gettempdir(), "output.xlsx")
+                
                 df.to_excel(temp_file_path, index=False)
-
+    
                 with open(temp_file_path, "rb") as file:
                     st.download_button(
                         label="ダウンロード",
@@ -230,11 +233,10 @@ class PriceScraperUI:
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                         use_container_width=True
                     )
-
+    
                 os.remove(temp_file_path)
         except FileNotFoundError:
             st.warning("スクレイピングされたデータはまだない。")
-
     
     def logout(self):
         # session = get_session_id()

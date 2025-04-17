@@ -10,7 +10,7 @@ venv/
 .env/
 env/
 
-cookies/
+cookies/*
 
 system/
 
@@ -20,11 +20,10 @@ system/
 
 
 # Ignore CSV input (optional, if you don’t want to commit JAN codes)
-data/jan_codes.csv
-data/users.json
+data/*
 
 # Ignore Selenium WebDriver binaries
-drivers/chromedriver
+drivers/*
 drivers/geckodriver
 
 # Ignore IDE/editor settings
