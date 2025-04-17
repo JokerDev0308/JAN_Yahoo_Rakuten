@@ -15,7 +15,7 @@ class WebDriverManager:
                 options.add_argument("--headless")
                 options.add_argument("--no-sandbox")
                 options.add_argument("--disable-dev-shm-usage")
-                options.binary_location = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+                options.binary_location = "/usr/bin/google-chrome"
                 options.add_argument("--remote-debugging-port=0")  
                 options.add_experimental_option("detach", False)
             
