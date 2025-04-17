@@ -4,6 +4,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import TIMEOUT
 from webdriver_manager import WebDriverManager
 
+import pickle
+import os
+import time
+
 import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,6 +16,34 @@ logger = logging.getLogger(__name__)
 class YahooScraper:
     def __init__(self):
         self.driver = WebDriverManager.get_driver("yahoo")
+        self.load_cookies()
+    
+
+    def load_cookies(self):
+        """Load saved Yahoo cookies to maintain login session."""
+        try:
+            cookies_path = "cookies/yahoo_cookies.pkl"
+            if not os.path.exists(cookies_path):
+                logger.warning("⚠️ Yahoo cookies file not found. Run the login script first.")
+                return
+
+            # Navigate to Yahoo first (required before adding cookies)
+            self.driver.get("https://shopping.yahoo.co.jp/")
+            time.sleep(2)
+
+            with open(cookies_path, "rb") as f:
+                cookies = pickle.load(f)
+            for cookie in cookies:
+                if 'expiry' in cookie:
+                    del cookie['expiry']  # optional fix for some versions
+                self.driver.add_cookie(cookie)
+
+            self.driver.refresh()
+            logger.info("✅ Yahoo cookies loaded, logged in session ready.")
+
+        except Exception as e:
+            logger.error(f"Failed to load Yahoo cookies: {e}")
+
 
     def scrape_price(self, jan_code, url):
         """

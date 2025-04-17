@@ -9,6 +9,10 @@ from session_manager import SessionManager
 import config
 from http.cookies import SimpleCookie
 
+from io import StringIO
+
+from make_pkl import save_cookies_to_pickle
+
 session_manager = SessionManager()
 
 def authenticate(username: str, password: str) -> bool:
@@ -245,11 +249,25 @@ class PriceScraperUI:
         if st.session_state.logged_in:
             self.setup_sidebar()
 
-            tab1, tab2 = st.tabs(["スクラップ価格", "JANコードデータ"])
+            tab1, tab2, tab3 = st.tabs(["スクラップ価格", "JANコードデータ", "Upload cookie.json"])
             with tab1:
                 self.display_main_content()
             with tab2:
                 self.JANCODE_file_upload()
+            with tab3:
+                uploaded_file = st.file_uploader("Cookie JSONファイルをアップロード", type="json")
+
+                if uploaded_file is not None:
+                    st.success("Cookie JSONファイルがアップロードされました。")
+                    
+                    # Read the content as string
+                    stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+                    cookie_json_str = stringio.read()
+
+                    # Save cookies
+                    save_cookies_to_pickle(cookie_json_str)
+                else:
+                    st.warning("Cookie JSONファイルをアップロードしてください。")
         else:
             self.show_login_modal()
 
