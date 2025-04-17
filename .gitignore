@@ -18,7 +18,7 @@ system/
 *.log
 *.tmp
 
-
+tmp/*
 # Ignore CSV input (optional, if you don’t want to commit JAN codes)
 data/*
 
