@@ -54,7 +54,7 @@ class YahooScraper:
             stat_msg = "✅ Yahoo クッキーが読み込まれました。"
 
             # Check for login failure indicators
-            if "ログイン" in page_source or "login" in page_source.lower():
+            if "ログイン" in page_source:
                 stat_msg = '⚠️ Cookie が読み込まれましたが、ログインされていません。セッションが期限切れになっている可能性があります。'
                 logger.warning(stat_msg)               
 
